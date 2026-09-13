@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="UNIMATE" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#09090b" />
+    <link rel="apple-touch-icon" href="https://i.imgur.com/4M33j7n.jpg" />
+    <link rel="icon" type="image/jpeg" href="https://i.imgur.com/4M33j7n.jpg" />
+    <title>UNIMATE // CUTEO X AURA</title>
+    <style>
+      :root {
+        --bg-color: #09090b;
+        --card-bg: #121824;
+        --accent-cyan: #00f0ff;
+        --accent-purple: #8a2eff;
+        --accent-red: #ff004c;
+        --accent-blue-glow: #38bdf8;
+        --text-main: #f8fafc;
+        --text-sub: #94a3b8;
+        --border-color: #1e3a8a;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        overflow-x: hidden;
+        padding-bottom: 90px;
+        -webkit-tap-highlight-color: transparent;
+      }
+      #splashScreen {
+        position: fixed; inset: 0; background: radial-gradient(circle at center, #0c4a6e 0%, #09090b 80%); z-index: 99999;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        transition: opacity 0.6s ease, visibility 0.6s ease;
+      }
+      #splashScreen.fade-out { opacity: 0; visibility: hidden; }
+      @keyframes waveHand {
+        0%, 100% { transform: rotate(0deg); }
+        50% { transform: rotate(22deg) scale(1.15); }
+      }
+      @keyframes auraPulse {
+        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(56,189,248,0.6)); }
+        50% { transform: scale(1.05); filter: drop-shadow(0 0 25px rgba(0,240,255,0.9)); }
+      }
+      .gojo-splash-box {
+        position: relative; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center;
+        animation: auraPulse 2s infinite ease-in-out;
+      }
+      .gojo-avatar-wrap {
+        width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--accent-cyan);
+        background: rgba(14, 165, 233, 0.2); overflow: hidden; display: flex; align-items: center; justify-content: center;
+      }
+      .gojo-avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+      .gojo-wave-badge {
+        position: absolute; bottom: 8px; right: 8px; font-size: 1.8rem;
+        animation: waveHand 1.1s infinite ease-in-out; transform-origin: bottom right;
+      }
+      .splash-unimate-title {
+        font-size: 1.8rem; font-weight: 800; color: #fff; letter-spacing: 2px;
+        margin-top: 14px; text-shadow: 0 0 15px var(--accent-cyan);
+      }
+      .brand-greeting {
+        display: flex; align-items: center; margin-top: 14px; gap: 10px;
+        background: rgba(18, 24, 36, 0.95); padding: 8px 18px; border-radius: 14px;
+        border: 1px solid var(--accent-cyan); box-shadow: 0 8px 25px rgba(0,0,0,0.8);
+      }
+      .brand-bubble { font-size: 0.82rem; color: #cbd5e1; font-weight: 600; }
+      .brand-bubble span { color: var(--accent-cyan); }
+
+      /* AUTH OVERLAY SCREEN */
+      #authOverlay {
+        position: fixed; inset: 0; background: rgba(9, 9, 11, 0.96); z-index: 9998;
+        display: flex; align-items: center; justify-content: center; padding: 20px;
+      }
+      .auth-card {
+        background: var(--card-bg); border: 1px solid var(--accent-cyan); border-radius: 20px;
+        padding: 24px; width: 100%; max-width: 400px; text-align: center;
+        box-shadow: 0 0 30px rgba(0,240,255,0.2);
+      }
+      .auth-title { font-size: 1.2rem; font-weight: 800; color: var(--accent-cyan); margin-bottom: 6px; }
+      .auth-sub { font-size: 0.78rem; color: var(--text-sub); margin-bottom: 20px; }
+      .auth-input {
+        width: 100%; background: #050507; border: 1px solid var(--border-color); color: #fff;
+        padding: 12px 16px; border-radius: 10px; font-size: 0.88rem; outline: none; text-align: center;
+        margin-bottom: 12px; letter-spacing: 1px; font-family: monospace;
+      }
+      .auth-input:focus { border-color: var(--accent-cyan); box-shadow: 0 0 10px rgba(0,240,255,0.3); }
+      .auth-btn {
+        width: 100%; background: var(--accent-cyan); color: #000; border: none; padding: 12px;
+        border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.9rem; transition: 0.2s;
+      }
+      .auth-btn:hover { background: #38bdf8; box-shadow: 0 0 15px rgba(0,240,255,0.5); }
+      .auth-error { color: var(--accent-red); font-size: 0.76rem; margin-top: 10px; min-height: 18px; }
+      .key-info-badge {
+        margin-top: 14px; font-size: 0.74rem; color: var(--text-sub); background: rgba(255,255,255,0.03);
+        padding: 8px; border-radius: 8px; border: 1px dashed var(--border-color);
+      }
+
+      .app { max-width: 600px; margin: 0 auto; padding: 16px; }
+      .main-header { display: flex; justify-content: center; margin-bottom: 16px; }
+      .brand-gif { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; border: 1.5px solid var(--accent-cyan); }
+      
+      .profile-card {
+        background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px;
+        padding: 20px; text-align: center; margin-bottom: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      }
+      .profile-avatar img { width: 75px; height: 75px; border-radius: 50%; border: 2.5px solid var(--accent-cyan); margin-bottom: 10px; object-fit: cover; box-shadow: 0 0 15px rgba(0,240,255,0.4); }
+      .profile-body h2 { font-size: 1.3rem; margin-bottom: 2px; color: var(--text-main); }
+      .admin-tag { color: var(--accent-cyan); font-weight: 700; font-size: 0.85rem; letter-spacing: 0.8px; margin-bottom: 4px; text-transform: uppercase; }
+      
+      .home-info-box {
+        margin-top: 14px; background: rgba(9,9,11,0.5); border: 1px solid var(--border-color);
+        border-radius: 12px; padding: 14px; text-align: left; display: flex; flex-direction: column; gap: 8px; font-size: 0.84rem;
+      }
+      .home-info-box div b { color: var(--accent-cyan); }
+
+      .profile-links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
+      .profile-btn {
+        background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: #fff;
+        padding: 10px; border-radius: 10px; text-decoration: none; font-size: 0.8rem; font-weight: 600; transition: 0.2s;
+      }
+      .profile-btn:hover { background: rgba(0,240,255,0.15); border-color: var(--accent-cyan); }
+
+      .premium-banner {
+        background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px;
+        padding: 18px; margin-bottom: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      }
+      .premium-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+      .premium-icon svg { width: 26px; height: 26px; fill: url(#crownGradient); }
+      .premium-title { font-size: 0.95rem; font-weight: 700; color: var(--accent-cyan); letter-spacing: 0.5px; }
+      
+      .feature-grid { display: flex; flex-direction: column; gap: 12px; }
+      .feature-item {
+        display: flex; justify-content: space-between; align-items: center;
+        background: rgba(9,9,11,0.5); border: 1px solid var(--border-color); padding: 12px 14px; border-radius: 12px;
+      }
+      .feature-name { font-size: 0.88rem; font-weight: 600; }
+      .feature-sub { font-size: 0.72rem; color: var(--text-sub); margin-top: 2px; }
+
+      .toggle { position: relative; display: inline-block; width: 44px; height: 24px; }
+      .toggle input { opacity: 0; width: 0; height: 0; }
+      .switch {
+        position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+        background-color: #27272a; transition: .3s; border-radius: 24px;
+      }
+      .switch:before {
+        position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+        background-color: white; transition: .3s; border-radius: 50%;
+      }
+      input:checked + .switch { background-color: var(--accent-cyan); }
+      input:checked + .switch:before { transform: translateX(20px); }
+
+      .is-hidden { display: none !important; }
+      .panel { background: rgba(9,9,11,0.6); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 16px; overflow: hidden; }
+      .panelHead { padding: 12px 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+      .panelHead .name { font-size: 0.88rem; font-weight: 600; color: var(--accent-cyan); }
+      .meta { display: flex; gap: 6px; flex-wrap: wrap; }
+      .badge { background: rgba(255,255,255,0.08); padding: 3px 7px; border-radius: 6px; font-size: 0.7rem; }
+      .panelBody { padding: 14px; }
+      .chartBox { margin-bottom: 12px; }
+      .chartTop { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-sub); margin-bottom: 4px; }
+      canvas { width: 100%; height: 100px; background: #050507; border-radius: 8px; border: 1px solid var(--border-color); display: block; }
+      
+      .controls { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .controls button {
+        background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); color: #fff;
+        padding: 10px; border-radius: 8px; font-size: 0.76rem; font-weight: 600; cursor: pointer; transition: 0.2s;
+      }
+      .controls button:hover { background: rgba(0,240,255,0.2); border-color: var(--accent-cyan); }
+      .toggleOn { color: var(--accent-cyan) !important; border-color: var(--accent-cyan) !important; }
+
+      .consoleView {
+        height: 120px; background: #050507; border: 1px solid var(--border-color); border-radius: 8px;
+        padding: 8px; font-family: monospace; font-size: 0.68rem; overflow-y: auto; color: #34d399; margin-bottom: 8px; line-height: 1.4;
+      }
+      .consoleInput { display: flex; gap: 8px; }
+      .consoleInput input {
+        flex: 1; background: #050507; border: 1px solid var(--border-color); color: #fff; padding: 8px 12px;
+        border-radius: 8px; font-size: 0.78rem; outline: none;
+      }
+      .consoleInput button {
+        background: var(--accent-cyan); color: #000; border: none; padding: 0 14px; border-radius: 8px; font-weight: 700; cursor: pointer;
+      }
+
+      .booster-title { font-size: 1.05rem; margin-bottom: 12px; color: var(--accent-red); font-weight: 700; }
+      .booster-item {
+        display: flex; align-items: center; justify-content: space-between;
+        background: rgba(9,9,11,0.6); border: 1px solid var(--border-color); padding: 14px 16px; border-radius: 12px; margin-bottom: 10px;
+      }
+      .booster-item span { font-weight: 600; font-size: 0.92rem; flex: 1; color: #fff; }
+      .red { background: var(--accent-red); color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; text-align: center; }
+
+      .slider-box { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+      input[type="range"] { accent-color: var(--accent-cyan); width: 100%; }
+
+      .bottom-nav {
+        position: fixed; bottom: 0; left: 0; right: 0; background: rgba(18, 24, 36, 0.95);
+        backdrop-filter: blur(10px); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around;
+        padding: 8px 0; z-index: 1000; max-width: 600px; margin: 0 auto;
+      }
+      .bottom-item {
+        display: flex; flex-direction: column; align-items: center; text-decoration: none; color: var(--text-sub); font-size: 0.7rem; gap: 3px;
+        cursor: pointer; flex: 1;
+      }
+      .bottom-item.is-active { color: var(--accent-cyan); }
+      .bottom-icon svg { width: 20px; height: 20px; fill: currentColor; }
+
+      .modal-backdrop {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none;
+      }
+      .modal {
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        background: var(--card-bg); border: 1px solid var(--accent-red); border-radius: 16px;
+        padding: 20px; width: 85%; max-width: 300px; z-index: 10000; text-align: center; display: none;
+      }
+      .modal-icon { font-size: 1.8rem; color: var(--accent-red); margin-bottom: 6px; }
+      .modal-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; }
+      .modal-text { font-size: 0.78rem; color: var(--text-sub); }
+
+      #crosshairOverlay {
+        position: fixed; inset: 0; pointer-events: none; z-index: 9998; display: none;
+      }
+      .ch-graphic {
+        position: absolute; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center;
+        filter: drop-shadow(0 0 6px var(--accent-cyan));
+      }
+    </style>
+  </head>
+  <body>
+
+    <div id="splashScreen">
+      <div class="gojo-splash-box">
+        <div class="gojo-avatar-wrap">
+          <img src="https://i.imgur.com/4M33j7n.jpg" alt="Gojo Satoru" />
+        </div>
+        <div class="gojo-wave-badge" aria-hidden="true">👋</div>
+      </div>
+      <div class="splash-unimate-title">UNIMATE</div>
+      <div class="brand-greeting">
+        <div class="brand-bubble"><span>CUTEO X AURA</span> // PWA Standalone Mode</div>
+      </div>
+    </div>
+
+    <div id="authOverlay">
+      <div class="auth-card">
+        <div class="auth-title">🔒 UNIMATE AUTHENTICATION</div>
+        <div class="auth-sub">Vui lòng nhập Key kích hoạt bản quyền để tiếp tục</div>
+        <input type="text" id="keyInput" class="auth-input" placeholder="Nhập Key của bạn..." autocomplete="off" />
+        <button id="authBtn" class="auth-btn">KÍCH HOẠT KEY</button>
+        <div id="authError" class="auth-error"></div>
+        <div class="key-info-badge">
+          Hỗ trợ: Key Ngày, Tuần, Tháng, Vĩnh Viễn & Key Admin Đặc Biệt.
+        </div>
+      </div>
+    </div>
+
+    <div class="app">
+      <div class="main-header">
+        <img class="brand-gif" src="https://i.imgur.com/4M33j7n.jpg" alt="UNIMATE Brand" />
+      </div>
+
+      <section class="home-section" id="homeSection">
+        <article class="profile-card">
+          <div class="profile-avatar">
+            <img src="https://i.imgur.com/4M33j7n.jpg" alt="Cutèo x Aura" />
+          </div>
+          <div class="profile-body">
+            <h2>UNIMATE</h2>
+            <div class="admin-tag">Quản trị: cuteo.loveyou</div>
+            <div class="home-info-box">
+              <div>• <b>Điều hướng:</b> 5 tab</div>
+              <div>• <b>Hỗ trợ game:</b> FreeFire/Max</div>
+              <div>• <b>Booster game:</b> 100%</div>
+              <div>• <b>Trạng thái Key:</b> <span id="activeKeyType" style="color:var(--accent-cyan)">Đã kích hoạt</span></div>
+            </div>
+          </div>
+          <div class="profile-links">
+            <a class="profile-btn facebook" href="https://www.facebook.com/share/19QzvfXcpv/?mibextid=wwXIfr" target="_blank" rel="noopener">Facebook</a>
+            <a class="profile-btn zalo" href="https://zalo.me/0583516778">Zalo</a>
+            <a class="profile-btn tiktok" href="https://www.tiktok.com/@cuteo_120" target="_blank" rel="noopener">TikTok 1</a>
+            <a class="profile-btn tiktok" href="https://www.tiktok.com/@cuteo_120" target="_blank" rel="noopener">TikTok 2</a>
+          </div>
+        </article>
+      </section>
+
+      <section class="premium-banner is-hidden" id="functionSection">
+        <div class="premium-head">
+          <div class="premium-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 18h16v2H4zM4 6l4 6 4-6 4 6 4-6v10H4z"/><defs><linearGradient id="crownGradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00f0ff"/><stop offset="100%" stop-color="#8a2eff"/></linearGradient></defs></svg>
+          </div>
+          <div class="premium-text"><p class="premium-title">MODE PREMIUM ULTRA VIP</p></div>
+        </div>
+        <div class="feature-grid" id="featureGridContainer">
+          <div class="feature-item"><div><p class="feature-name">AimLock Head</p><p class="feature-sub">Bám Đầu</p></div><label class="toggle"><input type="checkbox" class="ft-toggle"/><span class="switch"></span></label></div>
+          <div class="feature-item"><div><p class="feature-name">Stability Assist</p><p class="feature-sub">Nhẹ Tâm</p></div><label class="toggle"><input type="checkbox" class="ft-toggle"/><span class="switch"></span></label></div>
+          <div class="feature-item"><div><p class="feature-name">Aim Hold</p><p class="feature-sub">Ghìm Tâm</p></div><label class="toggle"><input type="checkbox" class="ft-toggle"/><span class="switch"></span></label></div>
+          <div class="feature-item"><div><p class="feature-name">Aim LockDown</p><p class="feature-sub">Đầm Tâm</p></div><label class="toggle"><input type="checkbox" class="ft-toggle"/><span class="switch"></span></label></div>
+          <div class="feature-item"><div><p class="feature-name">Sensitivity Boost</p><p class="feature-sub">Nhạy</p></div><label class="toggle"><input type="checkbox" class="ft-toggle"/><span class="switch"></span></label></div>
+          <div class="feature-item"><div><p class="feature-name">Screen Boost</p><p class="feature-sub">Buff Màn</p></div><label class="toggle"><input type="checkbox" class="ft-toggle"/><span class="switch"></span></label></div>
+          <div class="feature-item"><div><p class="feature-name">HeadShot Fix</p><p class="feature-sub">Fix Lố Đầu</p></div><label class="toggle"><input type="checkbox" class="ft-toggle"/><span class="switch"></span></label></div>
+          <div class="feature-item"><div><p class="feature-name">Bullet Align</p><p class="feature-sub">Fix Lạc Đạn</p></div><label class="toggle"><input type="checkbox" class="ft-toggle"/><span class="switch"></span></label></div>
+          <div class="feature-item"><div><p class="feature-name">Shake Fix</p><p class="feature-sub">Fix Rung</p></div><label class="toggle"><input type="checkbox" class="ft-toggle"/><span class="switch"></span></label></div>
+        </div>
+      </section>
+
+      <section class="monitor-section is-hidden" id="monitorSection">
+        <div class="panel">
+          <div class="panel

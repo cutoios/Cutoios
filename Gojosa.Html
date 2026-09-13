@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="UNIMATE" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#09090b" />
+    <link rel="apple-touch-icon" href="https://i.imgur.com/4M33j7n.jpg" />
+    <link rel="icon" type="image/jpeg" href="https://i.imgur.com/4M33j7n.jpg" />
+    <title>UNIMATE // CUTEO X AURA</title>
+    <style>
+      :root {
+        --bg-color: #09090b;
+        --card-bg: #121824;
+        --accent-cyan: #00f0ff;
+        --accent-purple: #8a2eff;
+        --accent-red: #ff004c;
+        --accent-blue-glow: #38bdf8;
+        --text-main: #f8fafc;
+        --text-sub: #94a3b8;
+        --border-color: #1e3a8a;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        overflow-x: hidden;
+        padding-bottom: 90px;
+        -webkit-tap-highlight-color: transparent;
+      }
+      #splashScreen {
+        position: fixed; inset: 0; background: radial-gradient(circle at center, #0c4a6e 0%, #09090b 80%); z-index: 99999;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        transition: opacity 0.6s ease, visibility 0.6s ease;
+      }
+      #splashScreen.fade-out { opacity: 0; visibility: hidden; }
+      @keyframes waveHand {
+        0%, 100% { transform: rotate(0deg); }
+        50% { transform: rotate(22deg) scale(1.15); }
+      }
+      @keyframes auraPulse {
+        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(56,189,248,0.6)); }
+        50% { transform: scale(1.05); filter: drop-shadow(0 0 25px rgba(0,240,255,0.9)); }
+      }
+      .gojo-splash-box {
+        position: relative; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center;
+        animation: auraPulse 2s infinite ease-in-out;
+      }
+      .gojo-avatar-wrap {
+        width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--accent-cyan);
+        background: rgba(14, 165, 233, 0.2); overflow: hidden; display: flex; align-items: center; justify-content: center;
+      }
+      .gojo-avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+      .gojo-wave-badge {
+        position: absolute; bottom: 8px; right: 8px; font-size: 1.8rem;
+        animation: waveHand 1.1s infinite ease-in-out; transform-origin: bottom right;
+      }
+      .splash-unimate-title {
+        font-size: 1.8rem; font-weight: 800; color: #fff; letter-spacing: 2px;
+        margin-top: 14px; text-shadow: 0 0 15px var(--accent-cyan);
+      }
+      .brand-greeting {
+        display: flex; align-items: center; margin-top: 14px; gap: 10px;
+        background: rgba(18, 24, 36, 0.95); padding: 8px 18px; border-radius: 14px;
+        border: 1px solid var(--accent-cyan); box-shadow: 0 8px 25px rgba(0,0,0,0.8);
+      }
+      .brand-bubble { font-size: 0.82rem; color: #cbd5e1; font-weight: 600; }
+      .brand-bubble span { color: var(--accent-cyan); }
+
+      #authOverlay {
+        position: fixed; inset: 0; background: rgba(9, 9, 11, 0.96); z-index: 9998;
+        display: flex; align-items: center; justify-content: center; padding: 20px;
+      }
+      .auth-card {
+        background: var(--card-bg); border: 1px solid var(--accent-cyan); border-radius: 20px;
+        padding: 24px; width: 100%; max-width: 400px; text-align: center;
+        box-shadow: 0 0 30px rgba(0,240,255,0.2);
+      }
+      .auth-title { font-size: 1.2rem; font-weight: 800; color: var(--accent-cyan); margin-bottom: 6px; }
+      .auth-sub { font-size: 0.78rem; color: var(--text-sub); margin-bottom: 20px; }
+      .auth-input {
+        width: 100%; background: #050507; border: 1px solid var(--border-color); color: #fff;
+        padding: 12px 16px; border-radius: 10px; font-size: 0.88rem; outline: none; text-align: center;
+        margin-bottom: 12px; letter-spacing: 1px; font-family: monospace;
+      }
+      .auth-input:focus { border-color: var(--accent-cyan); box-shadow: 0 0 10px rgba(0,240,255,0.3); }
+      .auth-btn {
+        width: 100%; background: var(--accent-cyan); color: #000; border: none; padding: 12px;
+        border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.9rem; transition: 0.2s;
+      }
+      .auth-btn:hover { background: #38bdf8; box-shadow: 0 0 15px rgba(0,240,255,0.5); }
+      .auth-error { color: var(--accent-red); font-size: 0.76rem; margin-top: 10px; min-height: 18px; }
+      .key-info-badge {
+        margin-top: 14px; font-size: 0.74rem; color: var(--text-sub); background: rgba(255,255,255,0.03);
+        padding: 8px; border-radius: 8px; border: 1px dashed var(--border-color);
+      }
+
+      .app { max-width: 600px; margin: 0 auto; padding: 16px; }
+      .main-header { display: flex; justify-content: center; margin-bottom: 16px; }
+      .brand-gif { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; border: 1.5px solid var(--accent-cyan); }
+      
+      .profile-card {
+        background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px;
+        padding: 20px; text-align: center; margin-bottom: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      }
+      .profile-avatar img { width: 75px; height: 75px; border-radius: 50%; border: 2.5px solid var(--accent-cyan); margin-bottom: 10px; object-fit: cover; box-shadow: 0 0 15px rgba(0,240,255,0.4); }
+      .profile-body h2 { font-size: 1.3rem; margin-bottom: 2px; color: var(--text-main); }
+      .admin-tag { color: var(--accent-cyan); font-weight: 700; font-size: 0.85rem; letter-spacing: 0.8px; margin-bottom: 4px; text-transform: uppercase; }
+      
+      .home-info-box {
+        margin-top: 14px; background: rgba(9,9,11,0.5); border: 1px solid var(--border-color);
+        border-radius: 12px; padding: 14px; text-align: left; display: flex; flex-direction: column; gap: 8px; font-size: 0.84rem;
+      }
+      .home-info-box div b { color: var(--accent-cyan); }
+
+      .profile-links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
+      .profile-btn {
+        background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: #fff;
+        padding: 10px; border-radius: 10px; text-decoration: none; font-size: 0.8rem; font-weight: 600; transition: 0.2s;
+      }
+      .profile-btn:hover { background: rgba(0,240,255,0.15); border-color: var(--accent-cyan); }
+
+      .shortcut-card {
+        background: var(--card-bg); border: 1px solid var(--accent-cyan); border-radius: 16px;
+        padding: 18px; margin-bottom: 20px; box-shadow: 0 8px 30px rgba(0,240,255,0.12);
+      }
+      .shortcut-title { font-size: 0.95rem; font-weight: 700; color: var(--accent-cyan); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+      .shortcut-desc { font-size: 0.78rem; color: var(--text-sub); margin-bottom: 14px; line-height: 1.4; }
+      .shortcut-form { display: flex; flex-direction: column; gap: 10px; }
+      .shortcut-input {
+        width: 100%; background: #050507; border: 1px solid var(--border-color); color: #fff;
+        padding: 10px 14px; border-radius: 10px; font-size: 0.82rem; outline: none;
+      }
+      .shortcut-input:focus { border-color: var(--accent-cyan); }
+      .shortcut-select {
+        width: 100%; background: #050507; border: 1px solid var(--border-color); color: #fff;
+        padding: 10px 14px; border-radius: 10px; font-size: 0.82rem; outline: none;
+      }
+      .shortcut-btn {
+        background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); color: #fff; border: none;
+        padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.86rem; transition: 0.2s;
+      }
+      .shortcut-btn:hover { opacity: 0.9; }
+
+      .premium-banner {
+        background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px;
+        padding: 18px; margin-bottom: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      }
+      .premium-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+      .premium-icon svg { width: 26px; height: 26px; fill: url(#crownGradient); }
+      .premium-title { font-size: 0.95rem; font-weight: 700; color: var(--accent-cyan); letter-spacing: 0.5px; }
+      
+      .feature-grid { display: flex; flex-direction: column; gap: 12px; }
+      .feature-item {
+        display: flex; justify-content: space-between; align-items: center;
+        background: rgba(9,9,11,0.5); border: 1px solid var(--border-color); padding: 12px 14px; border-radius: 12px;
+      }
+      .feature-name { font-size: 0.88rem; font-weight: 600; }
+      .feature-sub { font-size: 0.72rem; color: var(--text-sub); margin-top: 2px; }
+
+      .toggle { position: relative; display: inline-block; width: 44px; height: 24px; }
+      .toggle input { opacity: 0; width: 0; height: 0; }
+      .switch {
+        position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+        background-color: #27272a; transition: .3s; border-radius: 24px;
+      }
+      .switch:before {
+        position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+        background-color: white; transition: .3s; border-radius: 50%;
+      }
+      input:checked + .switch { background-color: var(--accent-cyan); }
+      input:checked + .switch:before { transform: translateX(20px); }
+
+      .is-hidden { display: none !important; }
+      .panel { background: rgba(9,9,11,0.6); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 16px; overflow: hidden; }
+      .panelHead { padding: 12px 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+      .panelHead .name { font-size: 0.88rem; font-weight: 600; color: var(--accent-cyan); }
+      .meta { display: flex; gap: 6px; flex-wrap: wrap; }
+      .badge { background: rgba(255,255,255,0.08); padding: 3px 7px; border-radius: 6px; font-size: 0.7rem; }
+      .panelBody { padding: 14px; }
+      .chartBox { margin-bottom: 12px; }
+      .chartTop { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-sub); margin-bottom: 4px; }
+      canvas { width: 100%; height: 100px; background: #050507; border-radius: 8px; border: 1px solid var(--border-color); display: block; }
+      
+      .controls { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .controls button {
+        background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); color: #fff;
+        padding: 10px; border-radius: 8px; font-size: 0.76rem; font-weight: 600; cursor: pointer; transition: 0.2s;
+      }
+      .controls button:hover { background: rgba(0,240,255,0.2); border-color: var(--accent-cyan); }
+      .toggleOn { color: var(--accent-cyan) !important; border-color: var(--accent-cyan) !important; }
+
+      .consoleView {
+        height: 120px; background: #050507; border: 1px solid var(--border-color); border-radius: 8px;
+        padding: 8px; font-family: monospace; font-size: 0.68rem; overflow-y: auto; color: #34d399; margin-bottom: 8px; line-height: 1.4;
+      }
+      .consoleInput { display: flex; gap: 8px; }
+      .consoleInput input {
+        flex: 1; background: #050507; border: 1px solid var(--border-color); color: #fff; padding: 8px 12px;
+        border-radius: 8px; font-size: 0.78rem; outline: none;
+      }
+      .consoleInput button {
+        background: var(--accent-cyan); color: #000; border: none; padding: 0 14px; border-radius: 8px; font-weight: 700; cursor: pointer;
+      }
+
+      .booster-title { font-size: 1.05rem; margin-bottom: 12px; color: var(--accent-red); font-weight: 700; }
+      .booster-item {
+        display: flex; align-items: center; justify-content: space-between;
+        background: rgba(9,9,11,0.6); border: 1px solid var(--border-color); padding: 14px 16px; border-radius: 12px; margin-bottom: 10px;
+      }
+      .booster-item span { font-weight: 600; font-size: 0.92rem; flex: 1; color: #fff; }
+      .red { background: var(--accent-red); color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; text-align: center; }
+
+      .bottom-nav {
+        position: fixed; bottom: 0; left: 0; right: 0; background: rgba(18, 24, 36, 0.95);
+        backdrop-filter: blur(10px); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around;
+        padding: 8px 0; z-index: 1000; max-width: 600px; margin: 0 auto;
+      }
+      .bottom-item {
+        display: flex; flex-direction: column; align-items: center; text-decoration: none; color: var(--text-sub); font-size: 0.7rem; gap: 3px;
+        cursor: pointer; flex: 1;
+      }
+      .bottom-item.is-active { color: var(--accent-cyan); }
+      .bottom-icon svg { width: 20px; height: 20px; fill: currentColor; }
+
+      .modal-backdrop {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none;
+      }
+      .modal {
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        background: var(--card-bg); border: 1px solid var(--accent-red); border-radius: 16px;
+        padding: 20px; width: 85%; max-width: 300px; z-index: 10000; text-align: center; display: none;
+      }
+      .modal-icon { font-size: 1.8rem; color: var(--accent-red); margin-bottom: 6px; }
+      .modal-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; }
+      .modal-text { font-size: 0.78rem; color: var(--text-sub); }
+    </style>
+  </head>
+  <body>
+
+    <!-- LOBBY / SPLASH SCREEN -->
+    <div id="splashScreen">
+      <div class="gojo-splash-box">
+        <div class="gojo-avatar-wrap">
+          <img src="https://i.imgur.com/4M33j7n.jpg" alt="Gojo Satoru" />
+        </div>
+        <div class="gojo-wave-badge" aria-hidden="true">👋</div>
+      </div>
+      <div class="splash-unimate-title">UNIMATE</div>
+      <div class="brand-greeting">
+        <div class="brand-bubble"><span>CUTEO X AURA</span> // PWA Standalone Mode</div>
+      </div>
+    </div>
+
+    <!-- AUTHENTICATION SCREEN -->
+    <div id="authOverlay">
+      <div class="auth-card">
+        <div class="auth-title">🔒 UNIMATE AUTHENTICATION</div>
+        <div class="auth-sub">Vui lòng nhập Key kích hoạt bản quyền để tiếp tục</div>
+        <input type="text" id="keyInput" class="auth-input" placeholder="Nhập Key của bạn..." autocomplete="off" />
+        <button id="authBtn" class="auth-btn">KÍCH HOẠT KEY</button>
+        <div id="authError" class="auth-error"></div>
+        <div class="key-info-badge">
+          Hỗ trợ: Key Ngày, Tuần, Tháng, Vĩnh Viễn & Key Admin Đặc Biệt.
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN APP WRAPPER -->
+    <div class="app">
+      <div class="main-header">
+        <img class="brand-gif" src="https://i.imgur.com/4M33j7n.jpg" alt="UNIMATE Brand" />
+      </div>
+
+      <!-- HOME SECTION -->
+      <section class="home-section" id="homeSection">
+        <article class="profile-card">
+          <div class="profile-avatar">
+            <img src="https://i.imgur.com/4M33j7n.jpg" alt="Cutèo x Aura" />
+          </div>
+          <div class="profile-body">
+            <h2>UNIMATE</h2>
+            <div class="admin-tag">Quản trị: cuteo.loveyou</div>
+            <div class="home-info-box">
+              <div>• <b>Điều hướng:</b> 4 tab (Home, Function, Realtime, Boost)</div>
+              <div>• <b>Hỗ trợ game:</b> FreeFire/Max</div>
+              <div>• <b>Booster game:</b> Auto Inject JS + Direct App Launch</div>
+              <div>• <b>Trạng thái Key:</b> <span id="activeKeyType" style="color:var(--accent-cyan)">Đã kích hoạt</span></div>
+            </div>
+          </div>
+          <div class="profile-links">
+            <a class="profile-btn facebook" href="https://www.facebook.com/share/19QzvfXcpv/?mibextid=wwXIfr" target="_blank" rel="noopener">Facebook</a>
+            <a class="profile-btn zalo" href="https://zalo.me/0583516778">Zalo</a>
+            <a class="profile-btn tiktok" href="https://www.tiktok.com/@cuteo_120" target="_blank" rel="noopener">TikTok 1</a>
+            <a class="profile-btn tiktok" href="https://www.tiktok.com/@cuteo_120" target="_blank" rel="noopener">TikTok 2</a>
+          </div>
+        </article>
+
+        <!-- PWA / DIRECT APP LAUNCH SHORTCUT BUILDER -->
+        <article class="shortcut-card">
+          <div class="shortcut-title">🚀 THÊM SHORTCUT DIRECT APP VÀO MHS</div>
+          <div class="shortcut-desc">
+            Chọn app đích kích hoạt thẳng (bỏ qua Safari/Browser). Dán custom Scheme hoặc chọn game có sẵn.
+          </div>
+          <div class="shortcut-form">
+            <select id="shortcutTargetSelect" class="shortcut-select">
+              <option value="freefire://">Free Fire (freefire://)</option>
+              <option value="freefiremax://">Free Fire Max (freefiremax://)</option>
+              <option value="custom">Custom App Scheme / Universal Link...</option>
+            </select>
+            <input type="text" id="shortcutCustomInput" class="shortcut-input is-hidden" placeholder="Ví dụ: mygame://launch hoặc https://..." />
+            <input type="text" id="shortcutNameInput" class="shortcut-input" value="UNIMATE -> FF" placeholder="Tên hiển thị shortcut..." />
+            <button id="btnCreateShortcut" class="shortcut-btn">INJECT + LAUNCH TRỰC TIẾP</button>
+            <div id="shortcutNotice" style="font-size:0.72rem; color:var(--text-sub); text-align:center;"></div>
+          </div>
+        </article>
+      </section>
+
+      <!-- PREMIUM FUNCTION SECTION -->
+      <section class="premium-banner is-hidden" id="functionSection">
+        <div class="premium-head">
+          <div class="premium-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 18h16v2H4zM4 6l4 6 4-6 4 6 4-6v10H4z"/><defs><linearGradient id="crownGradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00f0ff"/><stop offset="100%" stop-color="#8a2eff"/></linearGradient></defs></svg>
+          </div>
+          <div class="premium-text"><p class="premium-title">MODE PREMIUM ULTRA VIP</p></div>
+        </div>
+        <div class="feature-grid" id="featureGridContainer">
+          <div class="feature-item"><div><p class="feature-name">AimLock Head</p><p class="feature-sub">Bám Đầu</p></div><label class="toggle"><input type="checkbox" class="ft-toggle"/><span class="switch"></span></label></div>
+          <div class="feature-item"><div><p class="feature-name">Stability Assist</p><p class="feature-sub">Nhẹ Tâm</p></div><label class="toggle"><input type="checkbox" class="ft-toggle"/><span class="switch"></span></label></div>
+          <div class="feature-item"><div><p class="feature-name">Aim Hold</p><p class="feature-sub">Ghìm Tâm</p></div><label class="toggle"><input type="checkbox" class="ft-toggle"/><span class="switch"></span></label></div>
+          <div class="feature-item"><div><p class="feature-name">Aim LockDown</p><p class="feature-sub">Đầm Tâm</p></div><label class="toggle"><input type="checkbox" class="ft-toggle"/><span class="switch"></span></label></div>
+          <div class="feature-item"><div><p class="feature-name">Sensitivity Boost</p><p class="feature-sub">Nhạy</p></div><label class="toggle"><input type="checkbox" class="ft-toggle"/><span class="switch"></span></label></div>
+          <div class="feature-item"><div><p class="feature-name">Screen Boost</p><p class="feature-sub">Buff Màn</p></div><label class="toggle"><input type="checkbox" class="ft-toggle"/><span class="switch"></span></label></div>
+          <div class="feature-item"><div><p class="feature-name">HeadShot Fix</p><p class="feature-sub">Fix Lố Đầu</p></div><label class="toggle"><input type="checkbox" class="ft-toggle"/><span class="switch"></span></label></div>
+          <div class="feature-item"><div><p class="feature-name">Bullet Align</p><p class="feature-sub">Fix Lạc Đạn</p></div><label class="toggle"><input type="checkbox" class="ft-toggle"/><span class="switch"></span></label></div>
+          <div class="feature-item"><div><p class="feature-name">Shake Fix</p><p class="feature-sub">Fix Rung</p></div><label class="toggle"><input type="checkbox" class="ft-toggle"/><span class="switch"></span></label></div>
+        </div>
+      </section>
+
+      <!-- REALTIME MONITOR SECTION -->
+      <section class="monitor-section is-hidden" id="monitorSection">
+        <div class="panel">
+          <div class="panelHead">
+            <div class="name">CPU & RAM Wave</div>
+            <div class="meta">
+              <span class="badge">FPS: <b id="mFps">90</b></span>
+              <span class="badge">Frame: <b id="mFrame">11.1</b> ms</span>
+              <span class="badge">CPU: <b id="mCpu">18</b>%</span>
+              <span class="badge">RAM: <b id="mRam">142 MB</b></span>
+            </div>
+          </div>
+          <div class="panelBody">
+            <div class="chartBox">
+              <div class="chartTop"><span>CPU Usage</span><span class="badge">Target: 90 FPS</span></div>
+              <canvas id="cpuCanvas"></canvas>
+            </div>
+            <div class="chartBox">
+              <div class="chartTop"><span>RAM Heap Used</span><span class="badge">Auto</span></div>
+              <canvas id="ramCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panelHead"><div class="name">Controls & Booster (Heavy Stream)</div></div>
+          <div class="panelBody">
+            <div class="controls">
+              <button id="btnLock" class="toggleOn">Lock 90 FPS: ON</button>
+              <button id="btnClearConsole">Xóa Console</button>
+              <button id="btnCleanRam">Dọn RAM (Spam)</button>
+              <button id="btnCleanCpu">Dọn CPU (Spam)</button>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panelHead"><div class="name">Console Stream</div><div class="meta"><span class="badge">Logs: <b id="mLogs">1</b></span></div></div>
+          <div class="panelBody">
+            <div id="consoleView" class="consoleView">[UNIMATE // CUTEO] Initialized - Ready for injection stream...</div>
+            <div class="consoleInput">
+              <input id="cmd" type="text" placeholder="Nhập lệnh JS..." autocomplete="off" />
+              <button id="btnExec">Run</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BOOSTER TAB SECTION -->
+      <section class="booster-section is-hidden" id="boosterSection">
+        <h2 class="booster-title">BOOSTER GAME (AUTO INJECT JS + DIRECT LAUNCH)</h2>
+        <div class="booster-item">
+          <span>FREE FIRE</span>
+          <a class="red direct-launch-btn" data-scheme="freefire://" data-js="loadConfig('ff_max_bypass'); setFps(90); activateAimLock(true);">BOOSTER DIRECT</a>
+        </div>
+        <div class="booster-item">
+          <span>FREE FIRE MAX</span>
+          <a class="red direct-launch-btn" data-scheme="freefiremax://" data-js="loadConfig('ffmax_ultra_v3'); setFps(90); activateAimLock(true);">BOOSTER DIRECT</a>
+        </div>
+      </section>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+      <a class="bottom-item is-active" data-target="homeSection">
+        <span class="bottom-icon"><svg viewBox="0 0 24 24"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1z"/></svg></span>
+        <span>Home</span>
+      </a>
+      <a class="bottom-item" data-target="functionSection">
+        <span class="bottom-icon"><svg viewBox="0 0 24 24"><path d="M9 3v3l-4 2 4 2v3l-7-3v-4zM15 3v3l4 2-4 2v3l7-3v-4zM9 15h6v6H9z"/></svg></span>
+        <span>Function</span>
+      </a>
+      <a class="bottom-item" data-target="monitorSection">
+        <span class="bottom-icon"><svg viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-6l-2 3-2-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></span>
+        <span>Realtime</span>
+      </a>
+      <a class="bottom-item" data-target="boosterSection">
+        <span class="bottom-icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></span>
+        <span>Booster</span>
+      </a>
+    </nav>
+
+    <!-- LIMIT MODAL -->
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal" id="limitModal">
+      <div class="modal-icon">⚠</div>
+      <div class="modal-title">Vượt Giới Hạn Kích Hoạt</div>
+      <div class="modal-text">Chỉ Cho Phép Bật 7 Chức Năng Tối Đa Đồng Thời.</div>
+    </div>
+
+    <script>
+      const VALID_KEYS = {
+        'DAY-A1B2-C3D4-E5F6': 'Key Ngày (24h)', 'DAY-X9Y8-Z7W6-V5U4': 'Key Ngày (24h)', 'DAY-K1L2-M3N4-O5P6': 'Key Ngày (24h)', 'DAY-Q7R8-S9T0-U1V2': 'Key Ngày (24h)',
+        'DAY-W3X4-Y5Z6-A7B8': 'Key Ngày (24h)', 'DAY-C9D0-E1F2-G3H4': 'Key Ngày (24h)', 'DAY-I5J6-K7L8-M9N0': 'Key Ngày (24h)', 'DAY-O1P2-Q3R4-S5T6': 'Key Ngày (24h)',
+        'DAY-U7V8-W9X0-Y1Z2': 'Key Ngày (24h)', 'DAY-A3B4-C5D6-E7F8': 'Key Ngày (24h)', 'DAY-G9H0-I1J2-K3L4': 'Key Ngày (24h)', 'DAY-M5N6-O7P8-Q9R0': 'Key Ngày (24h)',
+        'DAY-S1T2-U3V4-W5X6': 'Key Ngày (24h)', 'DAY-Y7Z8-A9B0-C1D2': 'Key Ngày (24h)', 'DAY-E3F4-G5H6-I7J8': 'Key Ngày (24h)', 'DAY-K9L0-M1N2-O3P4': 'Key Ngày (24h)',
+        'DAY-Q5R6-S7T8-U9V0': 'Key Ngày (24h)', 'DAY-W1X2-Y3Z4-A5B6': 'Key Ngày (24h)', 'DAY-C7D8-E9F0-G1H2': 'Key Ngày (24h)', 'DAY-I3J4-K5L6-M7N8': 'Key Ngày (24h)',
+        
+        'WEEK-A101-B202-C303': 'Key Tuần (7 ngày)', 'WEEK-D404-E505-F606': 'Key Tuần (7 ngày)', 'WEEK-G707-H808-I909': 'Key Tuần (7 ngày)', 'WEEK-J010-K111-L212': 'Key Tuần (7 ngày)',
+        'WEEK-M313-N414-O515': 'Key Tuần (7 ngày)', 'WEEK-P616-Q717-R818': 'Key Tuần (7 ngày)', 'WEEK-S919-T020-U121': 'Key Tuần (7 ngày)', 'WEEK-V222-W323-X424': 'Key Tuần (7 ngày)',
+        'WEEK-Y525-Z626-A727': 'Key Tuần (7 ngày)', 'WEEK-B828-C929-D030': 'Key Tuần (7 ngày)',
+
+        'MONT-99AA-11BB-22CC': 'Key Tháng (30 ngày)', 'MONT-33DD-44EE-55FF': 'Key Tháng (30 ngày)', 'MONT-66GG-77HH-88II': 'Key Tháng (30 ngày)', 'MONT-99JJ-00KK-11LL': 'Key Tháng (30 ngày)',
+        'MONT-22MM-33NN-44OO': 'Key Tháng (30 ngày)', 'MONT-55PP-66QQ-77RR': 'Key Tháng (30 ngày)', 'MONT-88SS-99TT-00UU': 'Key Tháng (30 ngày)', 'MONT-11VV-22WW-33XX': 'Key Tháng (30 ngày)',
+        'MONT-44YY-55ZZ-66AA': 'Key Tháng (30 ngày)', 'MONT-77BB-88CC-99DD': 'Key Tháng (30 ngày)',
+
+        'PERM-VIP1-VIP2-VIP3': 'Key Vĩnh Viễn', 'PERM-KING-0001-FF01': 'Key Vĩnh Viễn', 'PERM-GODX-9999-PROA': 'Key Vĩnh Viễn', 'PERM-UNIM-ATV3-MAX0': 'Key Vĩnh Viễn',
+        'PERM-LEAD-8888-FAST': 'Key Vĩnh Viễn', 'PERM-PROA-7777-AIML': 'Key Vĩnh Viễn', 'PERM-ULTI-6666-HEAD': 'Key Vĩnh Viễn', 'PERM-MAST-5555-LOCK': 'Key Vĩnh Viễn',
+        'PERM-SUPR-4433-2211': 'Key Vĩnh Viễn', 'PERM-REAL-1122-3344': 'Key Vĩnh Viễn',
+
+        'SPECIAL-ADMIN-ROOT-UNIMATE-V3-ALLINONE': 'Key Đặc Biệt (Admin VIP)'
+      };
+
+      function injectJsAndLaunchDirect(jsPayload, schemeUrl) {
+        const consoleView = document.getElementById('consoleView');
+        const notice = document.getElementById('shortcutNotice');
+        
+        if (jsPayload && consoleView) {
+          const hexPtr = '0x' + Math.floor(Math.random() * 0xffffffff).toString(16).toUpperCase().padStart(8, '0');
+          consoleView.innerHTML += `<br><span style="color:#00f0ff">[JS_INJECT] Executing payload: ${jsPayload} (ptr=${hexPtr})</span><br>`;
+          consoleView.scrollTop = consoleView.scrollHeight;
+        }
+
+        if (window.triggerHeavySpam) {
+          window.triggerHeavySpam('AUTO_BOOST_JS_INJECT', 12);
+        }
+
+        if (notice && schemeUrl) {
+          notice.textContent = `Đang inject & kích hoạt trực tiếp: ${schemeUrl}...`;
+        }
+
+        setTimeout(() => {
+          if (!schemeUrl) return;
+          const iframe = document.createElement('iframe');
+          iframe.style.display = 'none';
+          iframe.src = schemeUrl;
+          document.body.appendChild(iframe);
+
+          setTimeout(() => {
+            if (iframe.parentNode) document.body.removeChild(iframe);
+            window.location.href = schemeUrl;
+          }, 350);
+        }, 320);
+      }
+
+      window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+          const s = document.getElementById('splashScreen');
+          if(s) { s.classList.add('fade-out'); setTimeout(() => s.remove(), 600); }
+        }, 2200);
+
+        const savedKeyType = localStorage.getItem('unimate_active_key_type');
+        if (savedKeyType) {
+          document.getElementById('authOverlay').style.display = 'none';
+          document.getElementById('activeKeyType').textContent = savedKeyType;
+        }
+      });
+
+      const targetSelect = document.getElementById('shortcutTargetSelect');
+      const customInput = document.getElementById('shortcutCustomInput');
+      targetSelect.addEventListener('change', () => {
+        if (targetSelect.value === 'custom') {
+          customInput.classList.remove('is-hidden');
+        } else {
+          customInput.classList.add('is-hidden');
+        }
+      });
+
+      document.getElementById('btnCreateShortcut').addEventListener('click', () => {
+        let scheme = targetSelect.value === 'custom' ? customInput.value.trim() : targetSelect.value;
+        if (!scheme) {
+          alert('Vui lòng chọn hoặc nhập Scheme/URL app đích!');
+          return;
+        }
+        localStorage.setItem('unimate_preferred_launch_scheme', scheme);
+        injectJsAndLaunchDirect("loadCustomShortcutConfig(); applyOptimization(true);", scheme);
+      });
+
+      document.querySelectorAll('.direct-launch-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const targetScheme = btn.getAttribute('data-scheme');
+          const customJs = btn.getAttribute('data-js') || "optimizeEngine();";
+          injectJsAndLaunchDirect(customJs, targetScheme);
+        });
+      });
+
+      document.getElementById('authBtn').addEventListener('click', () => {
+        const inputVal = document.getElementById('keyInput').value.trim();
+        const errEl = document.getElementById('authError');
+
+        if (!inputVal) {
+          errEl.textContent = 'Vui lòng nhập vào ô trống!';
+          return;
+        }
+
+        if (VALID_KEYS[inputVal]) {
+          const keyType = VALID_KEYS[inputVal];
+          localStorage.setItem('unimate_active_key_type', keyType);
+          document.getElementById('activeKeyType').textContent = keyType;
+          document.getElementById('authOverlay').style.display = 'none';
+        } else {
+          errEl.textContent = 'Key không chính xác hoặc đã hết hạn!';
+        }
+      });
+
+      const sections = ['homeSection', 'functionSection', 'monitorSection', 'boosterSection'];
+      document.querySelectorAll('.bottom-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.preventDefault();
+          document.querySelectorAll('.bottom-item').forEach(el => el.classList.remove('is-active'));
+          item.classList.add('is-active');
+          const target = item.getAttribute('data-target');
+          sections.forEach(secId => {
+            document.getElementById(secId).classList.toggle('is-hidden', secId !== target);
+          });
+        });
+      });
+
+      const toggles = document.querySelectorAll('.ft-toggle');
+      const limitModal = document.getElementById('limitModal');
+      const modalBackdrop = document.getElementById('modalBackdrop');
+      toggles.forEach(chk => {
+        chk.addEventListener('change', () => {
+          const activeCount = Array.from(toggles).filter(t => t.checked).length;
+          if (activeCount > 7) {
+            chk.checked = false;
+            limitModal.style.display = 'block';
+            modalBackdrop.style.display = 'block';
+            setTimeout(() => {
+              limitModal.style.display = 'none';
+              modalBackdrop.style.display = 'none';
+            }, 1800);
+          } else {
+            triggerHeavySpam('TOGGLE_FEATURE', 10);
+          }
+        });
+      });
+
+      const cpuCanvas = document.getElementById('cpuCanvas');
+      const ramCanvas = document.getElementById('ramCanvas');
+      function initCanvasSize(c) {
+        if(!c) return;
+        c.width = c.parentElement.clientWidth || 300;
+        c.height = 100;
+      }
+      initCanvasSize(cpuCanvas);
+      initCanvasSize(ramCanvas);
+      window.addEventListener('resize', () => {
+        initCanvasSize(cpuCanvas);
+        initCanvasSize(ramCanvas);
+      });
+
+      function drawWave(canvas, val) {
+        if(!canvas) return;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#050507';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = '#00f0ff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        for(let i=0; i<canvas.width; i+=8) {
+          const y = canvas.height/2 + (Math.sin(i*0.06 + Date.now()*0.005)*18 * (val/50));
+          if(i===0) ctx.moveTo(i, y); else ctx.lineTo(i, y);
+        }
+        ctx.stroke();
+      }
+
+      const mFps = document.getElementById('mFps');
+      const mFrame = document.getElementById('mFrame');
+      const mCpu = document.getElementById('mCpu');
+      const mRam = document.getElementById('mRam');
+
+      setInterval(() => {
+        const currentFps = Math.floor(Math.random() * 3) + 88;
+        const currentFrame = (1000 / currentFps).toFixed(1);
+        const currentCpu = Math.floor(Math.random() * 10) + 14;
+        const currentRam = Math.floor(Math.random() * 15) + 138;
+
+        if(mFps) mFps.textContent = currentFps;
+        if(mFrame) mFrame.textContent = currentFrame;
+        if(mCpu) mCpu.textContent = currentCpu;
+        if(mRam) mRam.textContent = currentRam + ' MB';
+
+        drawWave(cpuCanvas, currentCpu);
+        drawWave(ramCanvas, currentRam);
+      }, 300);
+
+      const consoleView = document.getElementById('consoleView');
+      const cmdInput = document.getElementById('cmd');
+      const logCountBadge = document.getElementById('mLogs');
+      let logCount = 1;
+
+      window.triggerHeavySpam = function(tag, count = 35) {
+        let idx = 0;
+        const interval = setInterval(() => {
+          if (idx >= count) {
+            clearInterval(interval);
+            consoleView.innerHTML += `<br><span style="color:#00f0ff">[${tag}] COMPLETED -> ALL PACKETS SYNCED (0x${Math.floor(Math.random()*65535).toString(16)})</span><br>`;
+            consoleView.scrollTop = consoleView.scrollHeight;
+            return;
+          }
+          const hexPtr = '0x' + Math.floor(Math.random() * 0xffffffff).toString(16).toUpperCase().padStart(8, '0');
+          const valHex = '0x' + Math.floor(Math.random() * 0xffff).toString(16).toUpperCase();
+          consoleView.innerHTML += `<br>[${tag}] stream_${idx} ptr=${hexPtr} val=${valHex} status=OK`;
+          if (consoleView.children.length > 150) {
+            consoleView.innerHTML = consoleView.innerHTML.split('<br>').slice(-80).join('<br>');
+          }
+          consoleView.scrollTop = consoleView.scrollHeight;
+          logCount++;
+          if(logCountBadge) logCountBadge.textContent = logCount;
+          idx++;
+        }, 35);
+      };
+
+      document.getElementById('btnExec').addEventListener('click', () => {
+        if(cmdInput && cmdInput.value.trim()) {
+          consoleView.innerHTML += `<br><span style="color:#00f0ff">[MANUAL_JS] > ${cmdInput.value}</span>`;
+        }
+        triggerHeavySpam('EXEC_JS', 15);
+        if(cmdInput) cmdInput.value = '';
+      });
+      document.getElementById('btnClearConsole').addEventListener('click', () => {
+        consoleView.innerHTML = '[UNIMATE // CUTEO] Console cleared.';
+        logCount = 1;
+        if(logCountBadge) logCountBadge.textContent = logCount;
+      });
+      document.getElementById('btnCleanRam').addEventListener('click', () => {
+        triggerHeavySpam('RAM_GC_FLUSH', 35);
+      });
+      document.getElementById('btnCleanCpu').addEventListener('click', () => {
+        triggerHeavySpam('CPU_CORE_BALANCER', 35);
+      });
+      document.getElementById('btnLock').addEventListener('click', (e) => {
+        e.target.classList.toggle('toggleOn');
+        const state = e.target.classList.contains('toggleOn') ? 'ON' : 'OFF';
+        e.target.textContent = `Lock 90 FPS: ${state}`;
+        triggerHeavySpam(`FPS_LOCK_${state}`, 20);
+      });
+    </script>
+  </body>
+</html>

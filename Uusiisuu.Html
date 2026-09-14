@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNIMATE V3 - Multi-Func Launcher</title>
+    <style>
+        :root {
+            --bg-color: #030712;
+            --card-bg: #0b1329;
+            --primary: #c084fc;
+            --primary-glow: rgba(192, 132, 252, 0.45);
+            --accent-aura: #f472b6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(192, 132, 252, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+            background-image: radial-gradient(circle at 50% 0%, var(--primary-glow) 0%, transparent 65%);
+        }
+
+        #auth-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(3, 7, 18, 0.98);
+            backdrop-filter: blur(24px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            border: 1.5px solid var(--primary);
+            border-radius: 28px;
+            padding: 28px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 0 50px var(--primary-glow);
+        }
+
+        .logo-gif {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 2.5px solid var(--primary);
+            box-shadow: 0 0 30px var(--primary-glow);
+            object-fit: cover;
+            margin: 0 auto 12px auto;
+            display: block;
+            animation: divinePulse 3s infinite alternate;
+        }
+
+        @keyframes divinePulse {
+            0% { box-shadow: 0 0 20px var(--primary-glow); transform: scale(1); }
+            100% { box-shadow: 0 0 40px var(--accent-aura); transform: scale(1.03); }
+        }
+
+        .app-container {
+            flex: 1;
+            padding: 20px;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            display: none;
+            padding-bottom: 80px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            backdrop-filter: blur(12px);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .social-grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .btn-social {
+            background: rgba(192, 132, 252, 0.08);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 10px 6px;
+            border-radius: 12px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.75rem;
+            transition: 0.2s;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        input[type="text"], input[type="password"] {
+            flex: 1;
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 13px 16px;
+            color: var(--text-main);
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent-aura));
+            border: none;
+            color: #030712;
+            padding: 13px 22px;
+            border-radius: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-danger-outline {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 14px;
+            width: 100%;
+        }
+
+        /* BOTTOM NAV 5 TAB: HOME, NHẬP KEY, BOOST, LIVE, CÀI ĐẶT */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(11, 19, 41, 0.95);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            padding: 8px 4px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .nav-item {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 6px 0;
+            border-radius: 10px;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            background: rgba(192, 132, 252, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        .panel-box {
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        .panel-box strong { color: var(--primary); }
+    </style>
+</head>
+<body data-theme="divine">
+
+    <!-- OVERLAY ĐĂNG NHẬP / NHẬP KEY -->
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <!-- Gắn uchiha-hero.gif ở đây -->
+            <img src="uchiha-hero.gif" alt="UNIMATE Hero" class="logo-gif" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><circle cx=\'50\' cy=\'50\' r=\'48\' fill=\'%23030712\' stroke=\'%23c084fc\' stroke-width=\'4\'/><text x=\'50\' y=\'56\' fill=\'%23c084fc\' font-size=\'14\' text-anchor=\'middle\'>UNIMATE</text></svg>'">
+            <h3 style="margin-bottom: 4px; color: var(--primary); font-size: 1.3rem;">UNIMATE</h3>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 18px;">•cuteo X aura• Authentication</p>
+            <div class="input-group">
+                <input type="password" id="global-key-input" placeholder="Nhập key kích hoạt...">
+                <button class="btn" onclick="validateAppKeySecure()">Vào</button>
+            </div>
+            <div id="auth-error" style="margin-top: 8px; font-size: 0.75rem; color: #ef4444;"></div>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div class="app-container" id="main-app">
+        <div class="card">
+            <div class="profile-header">
+                <!-- Gắn Uchiha-logo.gif ở header chính -->
+                <img src="Uchiha-logo.gif" alt="UNIMATE Logo" class="logo-gif" style="width:78px;height:78px;" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><circle cx=\'50\' cy=\'50\' r=\'48\' fill=\'%23030712\' stroke=\'%23c084fc\' stroke-width=\'4\'/><text x=\'50\' y=\'56\' fill=\'%23c084fc\' font-size=\'14\' text-anchor=\'middle\'>UNIMATE</text></svg>'">
+                <div style="font-weight: 800; font-size: 1.2rem; color: var(--primary);">UNIMATE V3 • LAUNCHER</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 3px;">•cuteo X aura• Full Control</div>
+            </div>
+
+            <!-- 4 NÚT MẠNG XÃ HỘI -->
+            <div class="social-grid-4">
+                <a href="https://zalo.me/84583516778" target="_blank" class="btn-social">Zalo</a>
+                <a href="#" class="btn-social">FB</a>
+                <a href="#" class="btn-social">TikTok 1</a>
+                <a href="#" class="btn-social">TikTok 2</a>
+            </div>
+
+            <!-- TAB 1: HOME -->
+            <div id="tab-home" class="tab-content active">
+                <div class="panel-box">
+                    <strong>Trang Chủ (Home):</strong><br>
+                    Trạng thái HWID: <span id="hwid-display" style="color:var(--text-main);">Đang check...</span><br>
+                    Phiên bản core: <strong>UNIMATE V3 Standalone</strong>
+                </div>
+            </div>
+
+            <!-- TAB 2: NHẬP KEY -->
+            <div id="tab-key" class="tab-content">
+                <div class="panel-box">
+                    <strong>Quản Lý Key / Đổi Key:</strong><br><br>
+                    <div class="input-group">
+                        <input type="text" id="change-key-input" placeholder="Nhập key mới cần đổi...">
+                        <button class="btn" onclick="switchNewKey()">Đổi</button>
+                    </div>
+                    <button class="btn-danger-outline" onclick="forceLogoutAndResetSession()">🚪 Đăng Xuất / Xóa Phiên</button>
+                </div>
+            </div>
+
+            <!-- TAB 3: BOOST -->
+            <div id="tab-boost" class="tab-content">
+                <div class="panel-box">
+                    <strong>Boost Hiệu Năng:</strong><br>
+                    Tối ưu ping, giảm giật lag khung hình, giải phóng RAM ngầm cho thiết bị.
+                </div>
+            </div>
+
+            <!-- TAB 4: LIVE -->
+            <div id="tab-live" class="tab-content">
+                <div class="panel-box">
+                    <strong>Live Stream / Overlay:</strong><br>
+                    Cấu hình khung hình hiển thị layer nổi, tương tác livestream mượt mà.
+                </div>
+            </div>
+
+            <!-- TAB 5: CÀI ĐẶT -->
+            <div id="tab-setting" class="tab-content">
+                <div class="panel-box">
+                    <strong>Cài Đặt Hệ Thống:</strong><br>
+                    Chế độ PWA standalone, khóa chống debug, đồng bộ cấu hình cá nhân.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5 TAB BOTTOM NAVIGATION -->
+    <nav class="bottom-nav" id="bottom-navigation">
+        <button class="nav-item active" onclick="switchTab('home', this)"><span>🏠</span>Home</button>
+        <button class="nav-item" onclick="switchTab('key', this)"><span>🔑</span>Nhập Key</button>
+        <button class="nav-item" onclick="switchTab('boost', this)"><span>⚡</span>Boost</button>
+        <button class="nav-item" onclick="switchTab('live', this)"><span>📡</span>Live</button>
+        <button class="nav-item" onclick="switchTab('setting', this)"><span>⚙️</span>Cài đặt</button>
+    </nav>
+
+    <script>
+        function getDeviceHWID() {
+            let hwid = localStorage.getItem('un3_hwid');
+            if (!hwid) {
+                hwid = 'HWID-' + Math.random().toString(36).substring(2, 10).toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
+                localStorage.setItem('un3_hwid', hwid);
+            }
+            return hwid;
+        }
+
+        const validKeyRegistry = new Set([
+            "UN3-VIP-EXCLUSIVE-DIVINE-ROOT-000",
+            "UN3-DAY-73-AURA", "UN3-DAY-146-AURA", "UN3-DAY-219-AURA", "UN3-DAY-292-AURA", "UN3-DAY-365-AURA",
+            "UN3-WEEK-91-AURA", "UN3-WEEK-182-AURA", "UN3-WEEK-273-AURA", "UN3-WEEK-364-AURA",
+            "UN3-MONTH-127-AURA", "UN3-MONTH-254-AURA", "UN3-MONTH-381-AURA",
+            "NEW-KEY-001", "NEW-KEY-002", "NEW-KEY-AURA-999"
+        ]);
+
+        function checkSessionToken() {
+            return sessionStorage.getItem('un3_active_session');
+        }
+
+        function validateAppKeySecure() {
+            const keyVal = document.getElementById('global-key-input').value.trim().toUpperCase();
+            const errDiv = document.getElementById('auth-error');
+            const currentHWID = getDeviceHWID();
+
+            if (!keyVal || !validKeyRegistry.has(keyVal)) {
+                errDiv.innerText = 'Key không hợp lệ!';
+                return;
+            }
+
+            const keyBindings = JSON.parse(localStorage.getItem('un3_key_bindings') || '{}');
+            const boundHWID = keyBindings[keyVal];
+
+            if (boundHWID && boundHWID !== currentHWID) {
+                errDiv.innerText = 'Key đã khóa cho thiết bị khác (HWID lock 1:1)!';
+                return;
+            }
+
+            if (!boundHWID) {
+                keyBindings[keyVal] = currentHWID;
+                localStorage.setItem('un3_key_bindings', JSON.stringify(keyBindings));
+            }
+
+            sessionStorage.setItem('un3_active_session', keyVal);
+            errDiv.innerText = '';
+            showAppInterface();
+        }
+
+        function switchNewKey() {
+            const keyVal = document.getElementById('change-key-input').value.trim().toUpperCase();
+            if(!keyVal || !validKeyRegistry.has(keyVal)) {
+                alert('Key đổi không hợp lệ!');
+                return;
+            }
+            sessionStorage.setItem('un3_active_session', keyVal);
+            alert('Đã đổi key mới thành công!');
+        }
+
+        function forceLogoutAndResetSession() {
+            sessionStorage.removeItem('un3_active_session');
+            document.getElementById('global-key-input').value = '';
+            document.getElementById('auth-error').innerText = '';
+            document.getElementById('main-app').style.display = 'none';
+            document.getElementById('bottom-navigation').style.display = 'none';
+            document.getElementById('auth-overlay').style.display = 'flex';
+        }
+
+        function showAppInterface() {
+            document.getElementById('auth-overlay').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            document.getElementById('bottom-navigation').style.display = 'grid';
+            document.getElementById('hwid-display').innerText = getDeviceHWID();
+        }
+
+        function switchTab(tabId, btnEl) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            btnEl.classList.add('active');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if(checkSessionToken()) {
+                showAppInterface();
+            } else {
+                document.getElementById('auth-overlay').style.display = 'flex';
+                document.getElementById('main-app').style.display = 'none';
+                document.getElementById('bottom-navigation').style.display = 'none';
+            }
+        });
+
+        document.addEventListener('contextmenu', event => event.preventDefault());
+    </script>
+</body>
+</html>

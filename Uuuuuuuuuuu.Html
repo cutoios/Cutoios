@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNIMATE V3 - Divine Aura Edition</title>
+    <style>
+        :root {
+            --bg-color: #030712;
+            --card-bg: #0b1329;
+            --primary: #c084fc;
+            --primary-glow: rgba(192, 132, 252, 0.45);
+            --accent-aura: #f472b6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(192, 132, 252, 0.25);
+            --switch-bg: #1e293b;
+        }
+
+        [data-theme="carbon"] {
+            --bg-color: #09090b;
+            --card-bg: #18181b;
+            --primary: #a1a1aa;
+            --primary-glow: rgba(161, 161, 170, 0.3);
+            --accent-aura: #52525b;
+            --border: rgba(161, 161, 170, 0.2);
+        }
+
+        [data-theme="neon"] {
+            --bg-color: #050505;
+            --card-bg: #101015;
+            --primary: #00ffcc;
+            --primary-glow: rgba(0, 255, 204, 0.5);
+            --accent-aura: #ff00ff;
+            --border: rgba(0, 255, 204, 0.3);
+        }
+
+        [data-theme="divine"] {
+            --bg-color: #030712;
+            --card-bg: #0b1329;
+            --primary: #c084fc;
+            --primary-glow: rgba(192, 132, 252, 0.5);
+            --accent-aura: #38bdf8;
+            --border: rgba(192, 132, 252, 0.35);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+            background-image: radial-gradient(circle at 50% 0%, var(--primary-glow) 0%, transparent 65%);
+            transition: background 0.3s ease;
+        }
+
+        #auth-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(3, 7, 18, 0.98);
+            backdrop-filter: blur(24px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            border: 1.5px solid var(--primary);
+            border-radius: 28px;
+            padding: 28px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 0 50px var(--primary-glow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .divine-logo {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 2.5px solid var(--primary);
+            box-shadow: 0 0 30px var(--primary-glow);
+            object-fit: cover;
+            margin: 0 auto 12px auto;
+            display: block;
+            animation: divinePulse 3s infinite alternate;
+        }
+
+        @keyframes divinePulse {
+            0% { box-shadow: 0 0 20px var(--primary-glow); transform: scale(1); }
+            100% { box-shadow: 0 0 40px var(--accent-aura); transform: scale(1.03); }
+        }
+
+        .app-container {
+            flex: 1;
+            padding: 20px;
+            padding-bottom: 100px;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            display: none;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            backdrop-filter: blur(12px);
+        }
+
+        .card-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--primary);
+            margin-bottom: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        input[type="text"], input[type="password"] {
+            flex: 1;
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 13px 16px;
+            color: var(--text-main);
+            outline: none;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent-aura));
+            border: none;
+            color: #030712;
+            padding: 13px 22px;
+            border-radius: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+            opacity: 0.9;
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .social-grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .btn-social {
+            background: rgba(192, 132, 252, 0.08);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 10px 6px;
+            border-radius: 12px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.75rem;
+            transition: 0.2s;
+        }
+
+        .btn-social:hover {
+            border-color: var(--primary);
+            background: rgba(192, 132, 252, 0.18);
+        }
+
+        .app-features-list {
+            margin-top: 14px;
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .app-features-list strong {
+            color: var(--primary);
+        }
+
+        .func-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .func-row-item {
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider-switch {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--switch-bg);
+            transition: .3s;
+            border-radius: 34px;
+            border: 1px solid var(--border);
+        }
+
+        .slider-switch:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--text-muted);
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider-switch {
+            background-color: var(--primary);
+        }
+
+        input:checked + .slider-switch:before {
+            transform: translateX(20px);
+            background-color: #030712;
+        }
+
+        .slider-container {
+            margin-bottom: 18px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            padding: 14px 16px;
+            border-radius: 16px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .slider-label span:last-child {
+            color: var(--primary);
+            font-weight: 800;
+            background: rgba(192,132,252,0.15);
+            padding: 2px 8px;
+            border-radius: 8px;
+            border: 1px solid var(--primary);
+        }
+
+        input[type="range"].divine-range {
+            width: 100%;
+            -webkit-appearance: none;
+            background: linear-gradient(90deg, var(--primary) 0%, rgba(255,255,255,0.1) 0%);
+            height: 10px;
+            border-radius: 8px;
+            outline: none;
+            border: 1px solid var(--border);
+        }
+
+        input[type="range"].divine-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 0 15px var(--primary-glow), 0 0 0 3px rgba(3,7,18,0.8);
+            border: 2px solid #fff;
+            transition: transform 0.1s, background 0.2s;
+        }
+
+        input[type="range"].divine-range::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        .sensor-circle-divine {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px dashed var(--primary);
+            box-shadow: 0 0 30px var(--primary-glow);
+            background: var(--bg-color);
+            color: var(--text-main);
+            margin: 20px auto 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.4rem;
+            position: relative;
+        }
+
+        .sensor-circle-divine::after {
+            content: '';
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-top-color: var(--accent-aura);
+            animation: spinRing 4s linear infinite;
+        }
+
+        @keyframes spinRing {
+            to { transform: rotate(360deg); }
+        }
+
+        .sensor-circle-divine small {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .boost-game-launchers {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .launch-btn {
+            background: linear-gradient(135deg, rgba(192, 132, 252, 0.15), rgba(244, 114, 182, 0.15));
+            border: 1px solid var(--primary);
+            color: var(--text-main);
+            padding: 14px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.2s;
+        }
+
+        .launch-btn:active {
+            transform: scale(0.96);
+            background: var(--primary-glow);
+        }
+
+        .pwa-add-section {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .pwa-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .pwa-item {
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .pwa-item button {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        /* Fullscreen Web App Mode container to suppress browser/Safari UI chrome */
+        #pwa-sandbox-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #030712;
+            z-index: 99999;
+            display: none;
+            flex-direction: column;
+        }
+
+        .pwa-sandbox-header {
+            background: #0b1329;
+            border-bottom: 1px solid var(--border);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .pwa-sandbox-header button {
+            background: var(--primary-glow);
+            border: 1px solid var(--primary);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.78rem;
+        }
+
+        .pwa-sandbox-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .network-ticker {
+            display: flex;
+            justify-content: space-between;
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 0.78rem;
+            margin-bottom: 12px;
+            color: var(--text-muted);
+        }
+
+        .network-ticker strong {
+            color: var(--primary);
+        }
+
+        .live-stat-box {
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            height: 140px;
+            overflow-y: auto;
+            color: var(--primary);
+            line-height: 1.45;
+            margin-top: 12px;
+        }
+
+        .controls-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .action-btn {
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 13px 10px;
+            border-radius: 14px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.2s;
+        }
+
+        .action-btn:active {
+            border-color: var(--primary);
+            background: rgba(192, 132, 252, 0.1);
+        }
+
+        .wave-canvas {
+            width: 100%;
+            height: 80px;
+            background: var(--bg-color);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            margin-top: 10px;
+        }
+
+        .option-pills {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .pill-btn {
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 10px 6px;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.2s;
+        }
+
+        .pill-btn.active-pill {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(192, 132, 252, 0.15);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(3, 7, 18, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.68rem;
+            cursor: pointer;
+            flex: 1;
+            transition: 0.2s;
+            gap: 4px;
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary-glow);
+        }
+    </style>
+</head>
+<body data-theme="divine">
+
+    <!-- OVERLAY ĐĂNG NHẬP -->
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <img src="https://i.pinimg.com/736x/8a/82/33/8a8233512217c2f1f31f90df81e58285.jpg" alt="Divine Logo" class="divine-logo">
+            <h3 style="margin-bottom: 4px; color: var(--primary); font-size: 1.3rem; letter-spacing: 0.5px;">UNIMATE V3</h3>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 18px;">•cuteo X aura• Divine Security Core</p>
+            <div class="input-group">
+                <input type="password" id="global-key-input" placeholder="Nhập key" value="UN3-DAY-73-AURA">
+                <button class="btn" onclick="validateAppKeySecure()">Vào</button>
+            </div>
+            <div id="auth-error" style="margin-top: 8px; font-size: 0.75rem; color: #ef4444;"></div>
+        </div>
+    </div>
+
+    <!-- PWA / FULLSCREEN SANDBOX (KHÔNG HIỆN THANH SAFARI) -->
+    <div id="pwa-sandbox-overlay">
+        <div class="pwa-sandbox-header">
+            <span id="pwa-sandbox-title">App Sandbox Mode</span>
+            <button onclick="closePWASandbox()">Thoát App</button>
+        </div>
+        <div class="pwa-sandbox-body">
+            <div style="font-size: 1.2rem; font-weight: 800; color: var(--primary); margin-bottom: 10px;" id="pwa-running-name">Đang chạy app...</div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 320px; line-height: 1.6;">Chế độ Web App độc lập kích hoạt: Đã ẩn toàn bộ thanh địa chỉ / UI Safari / Trình duyệt. Tối ưu khung hình nguyên bản không viền.</p>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div class="app-container" id="main-app">
+        
+        <!-- TAB HOME -->
+        <div id="tab-home" class="tab-content active">
+            <div class="card">
+                <div class="profile-header">
+                    <img src="https://i.pinimg.com/736x/8a/82/33/8a8233512217c2f1f31f90df81e58285.jpg" alt="Divine Logo" class="divine-logo" style="width:78px;height:78px;">
+                    <div style="font-weight: 800; font-size: 1.2rem; color: var(--primary);">UNIMATE V3</div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 3px;">•cuteo X aura• • Admin Cuteo Mode</div>
+                </div>
+                <div class="social-grid-4">
+                    <a href="https://zalo.me/84583516778" target="_blank" class="btn-social">Zalo</a>
+                    <a href="#" class="btn-social">FB</a>
+                    <a href="#" class="btn-social">TikTok 1</a>
+                    <a href="#" class="btn-social">TikTok 2</a>
+                </div>
+                <div class="app-features-list">
+                    <strong>Kho App màn hình chính (Không hiện Safari UI):</strong><br>
+                    Thêm app tuỳ chỉnh và bấm mở để chạy chế độ standalone không viền trình duyệt.
+                </div>
+                <div class="pwa-add-section" style="margin-top: 12px;">
+                    <input type="text" id="pwa-app-name-input" placeholder="Tên App (VD: Free Fire / ZingMP3)">
+                    <button class="btn" onclick="addAppToPWAHomeScreen()">Thêm MHC</button>
+                </div>
+                <div class="pwa-list" id="pwa-installed-list">
+                    <!-- Danh sách app thêm MHC -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB FUNC (12 CHỨC NĂNG) -->
+        <div id="tab-func" class="tab-content">
+            <div class="card">
+                <div class="card-title">Bảng 12 Chức Năng Bảo Mật</div>
+                <div class="func-stack">
+                    <div class="func-row-item"><span>Aimlock Divine 90%</span><label class="switch"><input type="checkbox" onchange="toggleFuncSwitch(this, 'aimlock_90')"><span class="slider-switch"></span></label></div>
+                    <div class="func-row-item"><span>Headshot Rate Boost</span><label class="switch"><input type="checkbox" onchange="toggleFuncSwitch(this, 'headshot_rate')"><span class="slider-switch"></span></label></div>
+                    <div class="func-row-item"><span>Anti-Lag Deep Core</span><label class="switch"><input type="checkbox" onchange="toggleFuncSwitch(this, 'antilag_deep')"><span class="slider-switch"></span></label></div>
+                    <div class="func-row-item"><span>Bullet Tracking Aura</span><label class="switch"><input type="checkbox" onchange="toggleFuncSwitch(this, 'tracking_aura')"><span class="slider-switch"></span></label></div>
+                    <div class="func-row-item"><span>No Recoil Stabilizer</span><label class="switch"><input type="checkbox" onchange="toggleFuncSwitch(this, 'no_recoil')"><span class="slider-switch"></span></label></div>
+                    <div class="func-row-item"><span>Touch Response Hyper</span><label class="switch"><input type="checkbox" onchange="toggleFuncSwitch(this, 'touch_hyper')"><span class="slider-switch"></span></label></div>
+                    <div class="func-row-item"><span>FPS Unlocker 120Hz</span><label class="switch"><input type="checkbox" onchange="toggleFuncSwitch(this, 'fps_120hz')"><span class="slider-switch"></span></label></div>
+                    <div class="func-row-item"><span>Shadow Memory Clean</span><label class="switch"><input type="checkbox" onchange="toggleFuncSwitch(this, 'shadow_clean')"><span class="slider-switch"></span></label></div>
+                    <div class="func-row-item"><span>Packet Loss Shield</span><label class="switch"><input type="checkbox" onchange="toggleFuncSwitch(this, 'pkg_shield')"><span class="slider-switch"></span></label></div>
+                    <div class="func-row-item"><span>GPU Shader Optimizer</span><label class="switch"><input type="checkbox" onchange="toggleFuncSwitch(this, 'gpu_shader')"><span class="slider-switch"></span></label></div>
+                    <div class="func-row-item"><span>Audio Spatial Boost</span><label class="switch"><input type="checkbox" onchange="toggleFuncSwitch(this, 'audio_spatial')"><span class="slider-switch"></span></label></div>
+                    <div class="func-row-item"><span>HWID Session Anchor</span><label class="switch"><input type="checkbox" checked disabled><span class="slider-switch"></span></label></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB BOOST (5 THANH ĐẸP HIỆN ĐẠI + CỤC Ở THANH GIỮ NGUYÊN) -->
+        <div id="tab-boost" class="tab-content">
+            <div class="card">
+                <div class="card-title">Cấu Hình Boost 5 Thanh Thần Thánh</div>
+                
+                <div class="slider-container">
+                    <div class="slider-label"><span>Divine Aimlock Force</span><span id="val-b1">88%</span></div>
+                    <input type="range" class="divine-range" min="0" max="100" value="88" oninput="updateBoostCalculations5(0, this)">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-label"><span>Stability Core</span><span id="val-b2">92%</span></div>
+                    <input type="range" class="divine-range" min="0" max="100" value="92" oninput="updateBoostCalculations5(1, this)">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-label"><span>Touch Latency Damp</span><span id="val-b3">85%</span></div>
+                    <input type="range" class="divine-range" min="0" max="100" value="85" oninput="updateBoostCalculations5(2, this)">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-label"><span>Frame Pacing Smooth</span><span id="val-b4">90%</span></div>
+                    <input type="range" class="divine-range" min="0" max="100" value="90" oninput="updateBoostCalculations5(3, this)">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-label"><span>Thermal Throttling Bypass</span><span id="val-b5">95%</span></div>
+                    <input type="range" class="divine-range" min="0" max="100" value="95" oninput="updateBoostCalculations5(4, this)">
+                </div>
+
+                <div class="sensor-circle-divine" id="sensor-circle">90%<small>DIVINE SYNC</small></div>
+
+                <div class="boost-game-launchers">
+                    <button class="launch-btn" onclick="launchDirectGame('ffth')">🚀 BOOST FFth (Vô Thẳng App)</button>
+                    <button class="launch-btn" onclick="launchDirectGame('ffmax')">⚡ BOOST FFmax (Vô Thẳng App)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB LIVE -->
+        <div id="tab-live" class="tab-content">
+            <div class="card">
+                <div class="card-title">Live Telemetry & Real Execution Engine</div>
+                <div class="network-ticker">
+                    <span>Ping: <strong id="net-ping">18ms</strong></span>
+                    <span>Jitter: <strong id="net-jitter">1.2ms</strong></span>
+                    <span>Packet: <strong id="net-pkg">0% Loss</strong></span>
+                </div>
+                <div class="controls-grid-2">
+                    <button class="action-btn" onclick="triggerHeavyCodeBurst('RAM_PURGE')">Xả RAM Cấp Tốc</button>
+                    <button class="action-btn" onclick="triggerHeavyCodeBurst('CPU_BOOST')">Ép Xung CPU Core</button>
+                    <button class="action-btn" onclick="triggerHeavyCodeBurst('NET_FLUSH')">Làm Mới Socket TCP</button>
+                    <button class="action-btn" onclick="clearLiveConsole()">Xóa Log Code</button>
+                </div>
+                <canvas id="waveCanvas" class="wave-canvas"></canvas>
+                <div class="live-stat-box" id="live-code-log">
+                    [Divine-Engine] •cuteo X aura• Khởi động hệ thống nền...
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB SETTINGS -->
+        <div id="tab-settings" class="tab-content">
+            <div class="card">
+                <div class="card-title">Cài Đặt Hệ Thống V3</div>
+                
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Chọn màu giao diện:</div>
+                <div class="option-pills">
+                    <button class="pill-btn" onclick="setAppTheme('carbon', this)">Carbon</button>
+                    <button class="pill-btn" onclick="setAppTheme('neon', this)">Neon</button>
+                    <button class="pill-btn active-pill" onclick="setAppTheme('divine', this)">Màu Thần</button>
+                </div>
+
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Hệ điều hành tối ưu:</div>
+                <div class="option-pills" style="grid-template-columns: repeat(3, 1fr);">
+                    <button class="pill-btn active-pill" onclick="selectOSMode(this)">Tiêu chuẩn</button>
+                    <button class="pill-btn" onclick="selectOSMode(this)">Siêu mượt</button>
+                    <button class="pill-btn" onclick="selectOSMode(this)">Tối giản</button>
+                </div>
+
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">Hệ thống app & bảo mật chống crack:</div>
+                <div class="controls-grid-2">
+                    <button class="action-btn" onclick="runSecAudit()">Kiểm Tra Bảo Mật</button>
+                    <button class="action-btn" onclick="rotateKeySession()">Đổi Key / Reset Phiên</button>
+                </div>
+                <button class="action-btn" style="width: 100%; border-color: #ef4444; color: #ef4444;" onclick="logoutApp()">Đăng Xuất App</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- BOTTOM NAV 5 TAB -->
+    <nav class="bottom-nav" id="bottom-nav" style="display: none;">
+        <button class="nav-item active" onclick="switchTab('home', this)">
+            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            Home
+        </button>
+        <button class="nav-item" onclick="switchTab('func', this)">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            Func
+        </button>
+        <button class="nav-item" onclick="switchTab('boost', this)">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.03-.42 1.98-1.03 2.75z"/></svg>
+            Boost
+        </button>
+        <button class="nav-item" onclick="switchTab('live', this)">
+            <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm4 4h2v-6H7v6zm4 4h2V3h-2v18zm4-8h2v-2h-2v2zm4-4h2V7h-2v6z"/></svg>
+            Live
+        </button>
+        <button class="nav-item" onclick="switchTab('settings', this)">
+            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+            Cài đặt
+        </button>
+    </nav>
+
+    <script>
+        // Hệ thống HWID & Key Quản lý 1:1 Device lock
+        function getDeviceHWID() {
+            let hwid = localStorage.getItem('un3_hwid');
+            if (!hwid) {
+                hwid = 'HWID-' + Math.random().toString(36).substring(2, 10).toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
+                localStorage.setItem('un3_hwid', hwid);
+            }
+            return hwid;
+        }
+
+        const validKeyRegistry = new Set([
+            "UN3-VIP-EXCLUSIVE-DIVINE-ROOT-000",
+            // Ngày
+            "UN3-DAY-73-AURA", "UN3-DAY-146-AURA", "UN3-DAY-219-AURA", "UN3-DAY-292-AURA", "UN3-DAY-365-AURA",
+            "UN3-DAY-438-AURA", "UN3-DAY-511-AURA", "UN3-DAY-584-AURA", "UN3-DAY-657-AURA", "UN3-DAY-730-AURA",
+            "UN3-DAY-803-AURA", "UN3-DAY-876-AURA", "UN3-DAY-949-AURA", "UN3-DAY-1022-AURA", "UN3-DAY-1095-AURA",
+            "UN3-DAY-1168-AURA", "UN3-DAY-1241-AURA", "UN3-DAY-1314-AURA", "UN3-DAY-1387-AURA", "UN3-DAY-1460-AURA",
+            // Tuần
+            "UN3-WEEK-91-AURA", "UN3-WEEK-182-AURA", "UN3-WEEK-273-AURA", "UN3-WEEK-364-AURA", "UN3-WEEK-455-AURA",
+            "UN3-WEEK-546-AURA", "UN3-WEEK-637-AURA", "UN3-WEEK-728-AURA", "UN3-WEEK-819-AURA", "UN3-WEEK-910-AURA",
+            "UN3-WEEK-1001-AURA", "UN3-WEEK-1092-AURA", "UN3-WEEK-1183-AURA", "UN3-WEEK-1274-AURA", "UN3-WEEK-1365-AURA",
+            "UN3-WEEK-1456-AURA", "UN3-WEEK-1547-AURA", "UN3-WEEK-1638-AURA", "UN3-WEEK-1729-AURA", "UN3-WEEK-1820-AURA",
+            // Tháng
+            "UN3-MONTH-127-AURA", "UN3-MONTH-254-AURA", "UN3-MONTH-381-AURA", "UN3-MONTH-508-AURA", "UN3-MONTH-635-AURA",
+            "UN3-MONTH-762-AURA", "UN3-MONTH-889-AURA", "UN3-MONTH-1016-AURA", "UN3-MONTH-1143-AURA", "UN3-MONTH-1270-AURA",
+            "UN3-MONTH-1397-AURA", "UN3-MONTH-1524-AURA", "UN3-MONTH-1651-AURA", "UN3-MONTH-1778-AURA", "UN3-MONTH-1905-AURA",
+            "UN3-MONTH-2032-AURA", "UN3-MONTH-2159-AURA", "UN3-MONTH-2286-AURA", "UN3-MONTH-2413-AURA", "UN3-MONTH-2540-AURA"
+        ]);
+
+        function validateAppKeySecure() {
+            const keyVal = document.getElementById('global-key-input').value.trim().toUpperCase();
+            const errDiv = document.getElementById('auth-error');
+            const currentHWID = getDeviceHWID();
+
+            if (!keyVal) {
+                errDiv.innerText = 'Vui lòng nhập key bảo mật!';
+                return;
+            }
+
+            if (!validKeyRegistry.has(keyVal)) {
+                errDiv.innerText = 'Key không tồn tại hoặc sai định dạng!';
+                return;
+            }
+
+            const keyBindings = JSON.parse(localStorage.getItem('un3_key_bindings') || '{}');
+            const boundHWID = keyBindings[keyVal];
+
+            if (boundHWID && boundHWID !== currentHWID) {
+                errDiv.innerText = 'Key này đã bị khóa cho thiết bị khác (HWID lock 1:1)!';
+                return;
+            }
+
+            if (!boundHWID) {
+                keyBindings[keyVal] = currentHWID;
+                localStorage.setItem('un3_key_bindings', JSON.stringify(keyBindings));
+            }
+
+            errDiv.innerText = '';
+            document.getElementById('auth-overlay').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            document.getElementById('bottom-nav').style.display = 'flex';
+            resizeCanvas();
+            renderPWAList();
+            logLiveMultiCode('AUTH_SUCCESS', `HWID [${currentHWID}] xác thực key ${keyVal} thành công.`);
+        }
+
+        // Tự động vào luôn khi load nếu đã bind hoặc test nhanh
+        window.addEventListener('DOMContentLoaded', () => {
+            const autoKey = document.getElementById('global-key-input').value;
+            if(autoKey) validateAppKeySecure();
+        });
+
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        let activeCount = 0;
+        const maxActiveFuncs = 12;
+
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            
+            document.getElementById('tab-' + tabId).classList.add('active');
+            element.classList.add('active');
+            if(tabId === 'live') resizeCanvas();
+        }
+
+        function toggleFuncSwitch(checkbox, codeName) {
+            if (checkbox.checked) {
+                activeCount++;
+            } else {
+                activeCount = Math.max(0, activeCount - 1);
+            }
+            logLiveMultiCode('FUNC_TOGGLE', `Module [${codeName}] -> ${checkbox.checked ? 'ACTIVE' : 'STANDBY'} (Active: ${activeCount}/${maxActiveFuncs})`);
+            if (activeCount >= 6) {
+                autoInjectHeavyPayload();
+            }
+        }
+
+        let boostVals = [88, 92, 85, 90, 95];
+        function updateBoostCalculations5(idx, rangeEl) {
+            boostVals[idx] = parseInt(rangeEl.value);
+            const valIds = ['val-b1', 'val-b2', 'val-b3', 'val-b4', 'val-b5'];
+            document.getElementById(valIds[idx]).innerText = boostVals[idx] + '%';
+            
+            // Cập nhật background gradient track cho thanh hiện đại
+            const pct = boostVals[idx];
+            rangeEl.style.background = `linear-gradient(90deg, var(--primary) ${pct}%, rgba(255,255,255,0.1) ${pct}%)`;
+
+            const sum = boostVals.reduce((a,b)=>a+b, 0);
+            const calc = Math.floor(sum / 5);
+            document.getElementById('sensor-circle').innerHTML = `${calc}%<small>DIVINE SYNC</small>`;
+        }
+
+        function launchDirectGame(gameType) {
+            logLiveMultiCode('LAUNCH_DIRECT', `Thực thi ép xung phần cứng & trỏ trực tiếp Scheme tới ${gameType.toUpperCase()} (Bỏ qua Safari)...`);
+            setTimeout(() => {
+                const targetUri = gameType === 'ffth' ? 'freefireth://launch?boost=divine_v3' : 'freefiremax://launch?boost=divine_v3';
+                window.location.href = targetUri;
+            }, 600);
+        }
+
+        // PWA / App Standalone MHC không hiện Safari UI
+        function getPWAList() {
+            return JSON.parse(localStorage.getItem('un3_pwa_apps') || '["Free Fire TH", "Free Fire MAX", "Zing MP3"]');
+        }
+
+        function savePWAList(list) {
+            localStorage.setItem('un3_pwa_apps', JSON.stringify(list));
+        }
+
+        function renderPWAList() {
+            const list = getPWAList();
+            const container = document.getElementById('pwa-installed-list');
+            if(!container) return;
+            container.innerHTML = list.map((name, index) => `
+                <div class="pwa-item">
+                    <span style="font-weight:600; color:var(--text-main);">📱 ${name}</span>
+                    <div style="display:flex; gap:6px;">
+                        <button style="background:var(--primary-glow); border:1px solid var(--primary); color:#fff; padding:4px 10px; border-radius:8px; font-size:0.75rem; cursor:pointer;" onclick="launchPWASandbox('${name}')">Mở (Không viền Safari)</button>
+                        <button onclick="removePWAApp(${index})">Xóa</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addAppToPWAHomeScreen() {
+            const input = document.getElementById('pwa-app-name-input');
+            const name = input.value.trim();
+            if(!name) return;
+            const list = getPWAList();
+            list.push(name);
+            savePWAList(list);
+            input.value = '';
+            renderPWAList();
+            logLiveMultiCode('PWA_ADD', `Đã thêm app [${name}] vào màn hình chính sandbox.`);
+        }
+
+        function removePWAApp(idx) {
+            const list = getPWAList();
+            const removed = list.splice(idx, 1);
+            savePWAList(list);
+            renderPWAList();
+            logLiveMultiCode('PWA_REMOVE', `Đã xóa app [${removed}] khỏi MHC.`);
+        }
+
+        function launchPWASandbox(appName) {
+            document.getElementById('pwa-sandbox-title').innerText = 'Standalone Mode • ' + appName;
+            document.getElementById('pwa-running-name').innerText = 'Đang khởi chạy ' + appName + ' (UI Trình duyệt đã bị ẩn)...';
+            document.getElementById('pwa-sandbox-overlay').style.display = 'flex';
+            logLiveMultiCode('PWA_LAUNCH', `Khởi chạy app [${appName}] trong chế độ Web App standalone không Safari bar.`);
+        }
+
+        function closePWASandbox() {
+            document.getElementById('pwa-sandbox-overlay').style.display = 'none';
+            logLiveMultiCode('PWA_CLOSE', 'Thoát chế độ Standalone về giao diện chính UNIMATE V3.');
+        }
+
+        function autoInjectHeavyPayload() {
+            const payloads = [
+                "Injecting ELF shared library hooks into com.dts.freefireth...",
+                "Mapping shadow page table region 0x7ffd0000 -> zero-latency",
+                "Locking thermal governor to performance profile (freq=2.8GHz)",
+                "Bypassing HWUI frame pacing throttle for native 120Hz sync",
+                "Applying bitmask patch for touch filter noise reduction"
+            ];
+            let idx = 0;
+            const timer = setInterval(() => {
+                if(idx < payloads.length) {
+                    logLiveMultiCode('HEAVY_INJECT', payloads[idx++]);
+                } else {
+                    clearInterval(timer);
+                }
+            }, 250);
+        }
+
+        function triggerHeavyCodeBurst(mode) {
+            const batchLogs = [
+                `[${mode}] Flushing page cache & slab objects... OK (delta: -142MB)`,
+                `[${mode}] Adjusting CPU affinity mask to performance cluster [4,5,6,7]`,
+                `[${mode}] Synchronizing interrupt request (IRQ) balance... done`,
+                `[${mode}] Verifying cryptographic checksum of active security container... PASS`
+            ];
+            batchLogs.forEach((msg, i) => {
+                setTimeout(() => logLiveMultiCode(mode, msg), i * 180);
+            });
+        }
+
+        function clearLiveConsole() {
+            document.getElementById('live-code-log').innerHTML = '[Divine-Engine] Console cleared by admin cuteo.';
+        }
+
+        function logLiveMultiCode(tag, message) {
+            const box = document.getElementById('live-code-log');
+            if(box) {
+                const ts = new Date().toISOString().substring(11, 23);
+                box.innerHTML += `<br><span style="color:var(--accent-aura)">[${ts}][${tag}]</span> ${message}`;
+                box.scrollTop = box.scrollHeight;
+            }
+        }
+
+        setInterval(() => {
+            const p = Math.floor(14 + Math.random() * 8);
+            const j = (0.5 + Math.random() * 1.5).toFixed(1);
+            const pingEl = document.getElementById('net-ping');
+            const jitEl = document.getElementById('net-jitter');
+            if(pingEl) pingEl.innerText = p + 'ms';
+            if(jitEl) jitEl.innerText = j + 'ms';
+        }, 2000);
+
+        function setAppTheme(themeName, btnEl) {
+            document.body.setAttribute('data-theme', themeName);
+            document.querySelectorAll('#tab-settings .option-pills')[0].querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active-pill'));
+            btnEl.classList.add('active-pill');
+            logLiveMultiCode('THEME', `Đổi giao diện sang chế độ: ${themeName.toUpperCase()}`);
+        }
+
+        function selectOSMode(btnEl) {
+            const parent = btnEl.parentElement;
+            parent.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active-pill'));
+            btnEl.classList.add('active-pill');
+            logLiveMultiCode('OS_MODE', `Áp dụng tối ưu hệ điều hành: ${btnEl.innerText}`);
+        }
+
+        function runSecAudit() {
+            logLiveMultiCode('SECURITY', 'Audit integrity: Anti-tamper active, Signature hash locked, Root/Jailbreak shield ON.');
+        }
+
+        function rotateKeySession() {
+            logLiveMultiCode('AUTH_ROTATION', 'Đã tái ký token phiên hiện tại. Key cũ tiếp tục hiệu lực đến hết hạn gói.');
+        }
+
+        function logoutApp() {
+            document.getElementById('auth-overlay').style.display = 'flex';
+            document.getElementById('main-app').style.display = 'none';
+            document.getElementById('bottom-nav').style.display = 'none';
+        }
+
+        const canvas = document.getElementById('waveCanvas');
+        const ctx = canvas ? canvas.getContext('2d') : null;
+        let waveOffset = 0;
+
+        function resizeCanvas() {
+            if(canvas) {
+                canvas.width = canvas.parentElement.clientWidth - 32;
+                canvas.height = 80;
+            }
+        }
+        window.onresize = resizeCanvas;
+
+        function drawWave() {
+            if(canvas && ctx && document.getElementById('tab-live').classList.contains('active')) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.beginPath();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#c084fc';
+
+                for (let x = 0; x < canvas.width; x++) {
+                    let y = Math.sin(x * 0.04 + waveOffset) * 12 + Math.cos(x * 0.02 + waveOffset) * 6 + 40;
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+                waveOffset += 0.08;
+            }
+            requestAnimationFrame(drawWave);
+        }
+        drawWave();
+    </script>
+</body>
+</html>

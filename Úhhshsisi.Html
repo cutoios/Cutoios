@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="divine">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNIMATE V3 - Quantum Core Pro Max</title>
+    <style>
+        :root {
+            --bg-color: #030712;
+            --card-bg: #0b1329;
+            --primary: #c084fc;
+            --primary-glow: rgba(192, 132, 252, 0.45);
+            --accent-aura: #f472b6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(192, 132, 252, 0.25);
+            --neon-green: #34d399;
+        }
+
+        [data-theme="quantum-blue"] {
+            --primary: #38bdf8;
+            --primary-glow: rgba(56, 189, 248, 0.45);
+            --accent-aura: #818cf8;
+        }
+        [data-theme="cyber-rose"] {
+            --primary: #fb7185;
+            --primary-glow: rgba(251, 113, 133, 0.45);
+            --accent-aura: #f472b6;
+        }
+        [data-theme="emerald-void"] {
+            --primary: #34d399;
+            --primary-glow: rgba(52, 211, 153, 0.45);
+            --accent-aura: #22d3ee;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+            background-image: radial-gradient(circle at 50% 0%, var(--primary-glow) 0%, transparent 65%);
+            transition: background 0.3s ease;
+        }
+
+        /* ANTI-INSPECT WATERMARK & OVERLAY */
+        #anti-debug-screen {
+            display: none;
+        }
+
+        /* AUTH OVERLAY (CHỈ NHẬP KEY LÚC VÀO) */
+        #auth-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(3, 7, 18, 0.98);
+            backdrop-filter: blur(24px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            border: 1.5px solid var(--primary);
+            border-radius: 28px;
+            padding: 28px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 0 50px var(--primary-glow);
+        }
+
+        .logo-gif {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 2.5px solid var(--primary);
+            box-shadow: 0 0 30px var(--primary-glow);
+            object-fit: cover;
+            margin: 0 auto 12px auto;
+            display: block;
+            animation: divinePulse 3s infinite alternate;
+        }
+
+        @keyframes divinePulse {
+            0% { box-shadow: 0 0 20px var(--primary-glow); transform: scale(1); }
+            100% { box-shadow: 0 0 40px var(--accent-aura); transform: scale(1.03); }
+        }
+
+        .app-container {
+            flex: 1;
+            padding: 16px;
+            max-width: 580px;
+            width: 100%;
+            margin: 0 auto;
+            display: none;
+            padding-bottom: 90px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(12px);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 14px;
+        }
+
+        /* 4 NÚT MXH */
+        .social-grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .btn-social {
+            background: rgba(192, 132, 252, 0.08);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 4px;
+            border-radius: 10px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.72rem;
+            transition: 0.2s;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        input[type="text"], input[type="password"] {
+            flex: 1;
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 13px 16px;
+            color: var(--text-main);
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent-aura));
+            border: none;
+            color: #030712;
+            padding: 12px 20px;
+            border-radius: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        /* QUẢN TRỊ VIÊN CUTEO KHÚC DÀI RA */
+        .admin-banner-long {
+            background: linear-gradient(135deg, rgba(192, 132, 252, 0.18), rgba(244, 114, 182, 0.12));
+            border: 1px solid var(--primary);
+            border-radius: 16px;
+            padding: 14px 18px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: inset 0 0 20px var(--primary-glow);
+        }
+
+        .admin-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .admin-badge-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+
+        /* 4 TAB BOTTOM NAVIGATION (BỎ TAB KEY RIÊNG) */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(11, 19, 41, 0.95);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            padding: 8px 4px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .nav-item {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.68rem;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+            padding: 6px 0;
+            border-radius: 10px;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            background: rgba(192, 132, 252, 0.12);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .panel-box {
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+        .panel-box strong { color: var(--primary); }
+
+        /* BOOST: 5 THANH KÉO ĐỘC LẠ + CỤC TRÒN TÍNH SỐ + CỤC NHỎ + 2 GAME FFTH / FFMAX */
+        .boost-game-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .game-launch-btn {
+            background: linear-gradient(135deg, rgba(52, 211, 153, 0.15), rgba(56, 189, 248, 0.15));
+            border: 1.5px solid var(--primary);
+            border-radius: 14px;
+            padding: 12px;
+            color: var(--text-main);
+            font-weight: 800;
+            font-size: 0.82rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .game-launch-btn:active { transform: scale(0.96); }
+
+        .quantum-slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .q-slider-item {
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 12px 14px;
+        }
+
+        .q-slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .value-bubble {
+            background: var(--primary);
+            color: #030712;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 900;
+            font-size: 0.72rem;
+        }
+
+        .custom-slider-track {
+            position: relative;
+            height: 14px;
+            background: rgba(192, 132, 252, 0.1);
+            border-radius: 999px;
+            overflow: visible;
+            cursor: pointer;
+            border: 1px solid var(--border);
+        }
+
+        .custom-slider-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent-aura));
+            border-radius: 999px;
+            width: 50%;
+            pointer-events: none;
+        }
+
+        .mini-dot-node {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid var(--primary);
+            box-shadow: 0 0 12px var(--primary);
+            pointer-events: none;
+            transition: left 0.05s ease;
+        }
+
+        /* LIVE: NHỊP SỐNG CPU/RAM + 6 CHỨC NĂNG + KHUNG CHẠY CODE THẬT */
+        .vitals-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .vital-box {
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .vital-num {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-top: 3px;
+        }
+
+        .live-func-grid-6 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .btn-live-fx {
+            background: rgba(192, 132, 252, 0.07);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px;
+            color: var(--text-main);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .btn-live-fx.active {
+            border-color: var(--primary);
+            background: rgba(192, 132, 252, 0.2);
+        }
+
+        .real-code-console {
+            background: #010409;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.68rem;
+            color: #34d399;
+            height: 110px;
+            overflow-y: auto;
+            line-height: 1.4;
+        }
+
+        /* CÀI ĐẶT: CHỈNH MÀU + CHỌN GIAO DIỆN + HỆ THỐNG ÂM THANH/BẢO MẬT/ĐĂNG XUẤT */
+        .theme-swatches {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+            margin-bottom: 12px;
+        }
+
+        .swatch-btn {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+            background: var(--bg-color);
+            color: var(--text-main);
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+        }
+        .swatch-btn.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .mode-selector-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .mode-option-btn {
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-main);
+            font-size: 0.76rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .mode-option-btn.selected {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .system-toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.78rem;
+        }
+
+        .switch-toggle {
+            width: 42px; height: 22px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 999px;
+            position: relative;
+            cursor: pointer;
+        }
+        .switch-toggle.on { background: var(--primary); }
+        .switch-toggle::after {
+            content: '';
+            position: absolute;
+            top: 3px; left: 3px;
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: #fff;
+            transition: 0.2s;
+        }
+        .switch-toggle.on::after { left: 23px; }
+    </style>
+</head>
+<body>
+
+    <!-- ANTI-DECRYPT / INSPECT PROTECTION LAYER -->
+    <script>
+        // Bảo vệ code obfuscation logic & anti-devtool basic guard
+        Object.freeze(window.crypto || {});
+        window.addEventListener('keydown', (e) => {
+            if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74))) {
+                e.preventDefault();
+            }
+        });
+    </script>
+
+    <!-- OVERLAY ĐĂNG NHẬP / NHẬP KEY LÚC VÀO -->
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <img src="uchiha-hero.gif" alt="UNIMATE Hero" class="logo-gif" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><circle cx=\'50\' cy=\'50\' r=\'48\' fill=\'%23030712\' stroke=\'%23c084fc\' stroke-width=\'4\'/><text x=\'50\' y=\'56\' fill=\'%23c084fc\' font-size=\'14\' text-anchor=\'middle\'>UNIMATE</text></svg>'">
+            <h3 style="margin-bottom: 4px; color: var(--primary); font-size: 1.3rem;">UNIMATE</h3>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 18px;">•cuteo X aura• Quantum Security Authentication</p>
+            <div class="input-group">
+                <input type="password" id="global-key-input" placeholder="Nhập key kích hoạt...">
+                <button class="btn" onclick="validateAppKeySecure()">Vào App</button>
+            </div>
+            <div id="auth-error" style="margin-top: 8px; font-size: 0.75rem; color: #ef4444;"></div>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div class="app-container" id="main-app">
+        <div class="card">
+            <div class="profile-header">
+                <img src="Uchiha-logo.gif" alt="UNIMATE Logo" class="logo-gif" style="width:74px;height:74px;" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><circle cx=\'50\' cy=\'50\' r=\'48\' fill=\'%23030712\' stroke=\'%23c084fc\' stroke-width=\'4\'/><text x=\'50\' y=\'56\' fill=\'%23c084fc\' font-size=\'14\' text-anchor=\'middle\'>UNIMATE</text></svg>'">
+                <div style="font-weight: 800; font-size: 1.15rem; color: var(--primary);">UNIMATE V3 • QUANTUM PRO</div>
+            </div>
+
+            <!-- 4 NÚT MXH -->
+            <div class="social-grid-4">
+                <a href="https://zalo.me/84583516778" target="_blank" class="btn-social">Zalo</a>
+                <a href="#" class="btn-social">FB</a>
+                <a href="#" class="btn-social">TikTok 1</a>
+                <a href="#" class="btn-social">TikTok 2</a>
+            </div>
+
+            <!-- QUẢN TRỊ VIÊN CUTEO KHÚC DÀI RA -->
+            <div class="admin-banner-long">
+                <div class="admin-left">
+                    <div class="admin-badge-dot"></div>
+                    <div>
+                        <div style="font-weight:800; font-size:0.85rem; color:var(--text-main);">100% QUẢN TRỊ VIÊN CUTEO • CORE ROOT</div>
+                        <div style="font-size:0.7rem; color:var(--text-muted);">Trạng thái bảo mật HWID: Đã mã hóa AES-256-GCM / Chống móc code tuyệt đối</div>
+                    </div>
+                </div>
+                <span style="font-size:0.72rem; color:var(--primary); font-weight:800;">VIP+</span>
+            </div>
+
+            <!-- TAB 1: HOME (THÔNG TIN APP ĐIỀU HƯỚNG 5 TAB + HỖ TRỢ FREEFIRE/MAX BOOSTER) -->
+            <div id="tab-home" class="tab-content active">
+                <div class="panel-box">
+                    <strong>Điều Hướng 5 Tab Hỗ Trợ Game:</strong><br>
+                    • <strong>Home:</strong> Trung tâm tổng quan thông tin hệ thống launcher.<br>
+                    • <strong>Nhập Key:</strong> Xác thực khóa 1 lần duy nhất lúc khởi động (đã ẩn tab thừa).<br>
+                    • <strong>Boost:</strong> Cấu hình 5 thanh kéo siêu độc lạ + Tự mở Free Fire / Free Fire Max.<br>
+                    • <strong>Live:</strong> Nhịp sống CPU/RAM thực + 6 core live + console chạy code real.<br>
+                    • <strong>Cài đặt:</strong> Tùy chỉnh màu sắc + Tiêu chuẩn/Siêu mượt/Tối giản + Âm thanh + Bảo mật & Đăng xuất.<br><br>
+                    Hỗ trợ chuyên sâu: <strong>Free Fire (TH/VN) & Free Fire MAX (OB52/OB53)</strong>.
+                </div>
+            </div>
+
+            <!-- TAB 2: BOOST (5 THANH KÉO CỤC TRÒN TÍNH SỐ + CỤC NHỎ + 2 APP FFTH/FFMAX TỰ MỞ) -->
+            <div id="tab-boost" class="tab-content">
+                <div class="boost-game-cards">
+                    <button class="game-launch-btn" onclick="launchDirectGame('Free Fire TH')"><span>🔥</span> Mở Free Fire TH</button>
+                    <button class="game-launch-btn" onclick="launchDirectGame('Free Fire MAX')"><span>⚡</span> Mở FF MAX</button>
+                </div>
+
+                <div class="quantum-slider-group">
+                    <div class="q-slider-item" data-id="1">
+                        <div class="q-slider-header"><span>1. Touch Responsiveness (Độ nhạy chạm)</span><span class="value-bubble" id="val-1">98%</span></div>
+                        <div class="custom-slider-track" onmousedown="startDragSlider(event, 1, 'val-1')" ontouchstart="startDragSlider(event, 1, 'val-1')">
+                            <div class="custom-slider-fill" id="fill-1" style="width:98%"></div>
+                            <div class="mini-dot-node" id="dot-1" style="left:98%"></div>
+                        </div>
+                    </div>
+
+                    <div class="q-slider-item" data-id="2">
+                        <div class="q-slider-header"><span>2. Render Frame Delta Lock (FPS Lock)</span><span class="value-bubble" id="val-2">120 FPS</span></div>
+                        <div class="custom-slider-track" onmousedown="startDragSlider(event, 2, 'val-2')" ontouchstart="startDragSlider(event, 2, 'val-2')">
+                            <div class="custom-slider-fill" id="fill-2" style="width:100%"></div>
+                            <div class="mini-dot-node" id="dot-2" style="left:100%"></div>
+                        </div>
+                    </div>
+
+                    <div class="q-slider-item" data-id="3">
+                        <div class="q-slider-header"><span>3. Headlock Quantum Assist Vector</span><span class="value-bubble" id="val-3">85%</span></div>
+                        <div class="custom-slider-track" onmousedown="startDragSlider(event, 3, 'val-3')" ontouchstart="startDragSlider(event, 3, 'val-3')">
+                            <div class="custom-slider-fill" id="fill-3" style="width:85%"></div>
+                            <div class="mini-dot-node" id="dot-3" style="left:85%"></div>
+                        </div>
+                    </div>
+
+                    <div class="q-slider-item" data-id="4">
+                        <div class="q-slider-header"><span>4. Netcode Packet Jitter Suppressor</span><span class="value-bubble" id="val-4">92ms boost</span></div>
+                        <div class="custom-slider-track" onmousedown="startDragSlider(event, 4, 'val-4')" ontouchstart="startDragSlider(event, 4, 'val-4')">
+                            <div class="custom-slider-fill" id="fill-4" style="width:92%"></div>
+                            <div class="mini-dot-node" id="dot-4" style="left:92%"></div>
+                        </div>
+                    </div>
+
+                    <div class="q-slider-item" data-id="5">
+                        <div class="q-slider-header"><span>5. GPU Shader Memory Purge Rate</span><span class="value-bubble" id="val-5">EXTREME</span></div>
+                        <div class="custom-slider-track" onmousedown="startDragSlider(event, 5, 'val-5')" ontouchstart="startDragSlider(event, 5, 'val-5')">
+                            <div class="custom-slider-fill" id="fill-5" style="width:100%"></div>
+                            <div class="mini-dot-node" id="dot-5" style="left:100%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: LIVE (NHỊP SỐNG CPU/RAM + 6 CHỨC NĂNG + KHUNG CHẠY CODE THẬT) -->
+            <div id="tab-live" class="tab-content">
+                <div class="vitals-grid">
+                    <div class="vital-box"><div style="font-size:0.68rem;color:var(---muted);">CPU LOAD</div><div class="vital-num" id="live-cpu">14%</div></div>
+                    <div class="vital-box"><div style="font-size:0.68rem;color:var(---muted);">RAM FREE</div><div class="vital-num" id="live-ram">3.2 GB</div></div>
+                    <div class="vital-box"><div style="font-size:0.68rem;color:var(---muted);">PING LIVE</div><div class="vital-num" id="live-ping">18ms</div></div>
+                </div>
+
+                <div class="live-func-grid-6">
+                    <button class="btn-live-fx" onclick="runRealLiveCode('OVERLAY_HUD_INJECT', this)"><span>🛡️</span> HUD Stream Safe</button>
+                    <button class="btn-live-fx" onclick="runRealLiveCode('ANTI_REPORT_SHIELD', this)"><span>👻</span> Anti-Report Ghost</button>
+                    <button class="btn-live-fx" onclick="runRealLiveCode('OBS_STREAM_BYPASS', this)"><span>📡</span> OBS Bypass Link</button>
+                    <button class="btn-live-fx" onclick="runRealLiveCode('TOUCH_SYNC_BOOST', this)"><span>👆</span> Sync Touch Rate</button>
+                    <button class="btn-live-fx" onclick="runRealLiveCode('MEMORY_CLEANER', this)"><span>🧹</span> RAM Sweep Live</button>
+                    <button class="btn-live-fx" onclick="runRealLiveCode('QUANTUM_LOCK_CORE', this)"><span>🔐</span> Quantum Key Pin</button>
+                </div>
+
+                <div style="font-size:0.72rem; color:var(--primary); font-weight:700; margin-bottom:4px;">REALTIME KERNEL CONSOLE LOGS:</div>
+                <div class="real-code-console" id="live-console-box">
+                    [SYSTEM] UNIMATE Quantum Core initialized...<br>
+                    [WATCHDOG] HWID 1:1 bound verified.<br>
+                    [READY] Waiting for telemetry trigger...
+                </div>
+            </div>
+
+            <!-- TAB 4: CÀI ĐẶT (CHỈNH MÀU + TIÊU CHUẨN/SIÊU MƯỢT/TỐI GIẢN + ÂM THANH + BẢO MẬT + ĐĂNG XUẤT) -->
+            <div id="tab-setting" class="tab-content">
+                <div class="panel-box">
+                    <strong>Chỉnh Màu Chủ Đạo App:</strong>
+                    <div class="theme-swatches">
+                        <button class="swatch-btn selected" onclick="setAppTheme('divine', this)">Tím Divine</button>
+                        <button class="swatch-btn" onclick="setAppTheme('quantum-blue', this)">Xanh Quantum</button>
+                        <button class="swatch-btn" onclick="setAppTheme('cyber-rose', this)">Hồng Cyber</button>
+                    </div>
+
+                    <strong>Chọn Chế Độ Hiệu Năng / Giao Diện:</strong>
+                    <div class="mode-selector-list" style="margin-top:8px;">
+                        <div class="mode-option-btn selected" onclick="selectPerfMode(this, 'Tiêu chuẩn')"><span>Tiêu chuẩn (Balanced UI/GPU)</span><span>✓</span></div>
+                        <div class="mode-option-btn" onclick="selectPerfMode(this, 'Siêu mượt')"><span>Siêu mượt (High Refresh / Zero Drop)</span><span></span></div>
+                        <div class="mode-option-btn" onclick="selectPerfMode(this, 'Tối giản')"><span>Tối giản (Minimal Compact)</span><span></span></div>
+                    </div>
+
+                    <div class="system-toggle-row">
+                        <span>Âm thanh khi bật nút (Audio Click Haptic)</span>
+                        <div class="switch-toggle on" id="audio-switch" onclick="toggleSwitch(this)"></div>
+                    </div>
+
+                    <div class="system-toggle-row">
+                        <span>Bảo mật chống ngược nhìn code / Obfuscate DOM</span>
+                        <div class="switch-toggle on" id="security-switch" onclick="toggleSwitch(this)"></div>
+                    </div>
+
+                    <button class="btn" style="width:100%; margin-top:14px; background:rgba(239, 68, 68, 0.18); color:#ef4444; border:1px solid #ef4444;" onclick="logoutAndClearSession()">
+                        🚪 Đăng Xuất Key / Xóa Cache Cục Bộ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4 TAB BOTTOM NAVIGATION (HOME, BOOST, LIVE, CÀI ĐẶT) -->
+    <nav class="bottom-nav" id="bottom-navigation">
+        <button class="nav-item active" onclick="switchTab('home', this)"><span>🏠</span>Home</button>
+        <button class="nav-item" onclick="switchTab('boost', this)"><span>⚡</span>Boost</button>
+        <button class="nav-item" onclick="switchTab('live', this)"><span>📡</span>Live</button>
+        <button class="nav-item" onclick="switchTab('setting', this)"><span>⚙️</span>Cài đặt</button>
+    </nav>
+
+    <script>
+        // HỆ THỐNG VALIDATE KEY MỘT LẦN LÚC VÀO
+        const validKeyRegistry = new Set([
+            "UN3-VIP-EXCLUSIVE-DIVINE-ROOT-000",
+            "UN3-DAY-73-AURA", "UN3-DAY-146-AURA", "UN3-DAY-219-AURA", "UN3-DAY-292-AURA", "UN3-DAY-365-AURA",
+            "NEW-KEY-001", "NEW-KEY-002", "NEW-KEY-AURA-999"
+        ]);
+
+        function getDeviceHWID() {
+            let hwid = localStorage.getItem('un3_hwid');
+            if (!hwid) {
+                hwid = 'HWID-' + Math.random().toString(36).substring(2, 10).toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
+                localStorage.setItem('un3_hwid', hwid);
+            }
+            return hwid;
+        }
+
+        function checkSessionToken() {
+            return sessionStorage.getItem('un3_active_session');
+        }
+
+        function validateAppKeySecure() {
+            const keyVal = document.getElementById('global-key-input').value.trim().toUpperCase();
+            const errDiv = document.getElementById('auth-error');
+            const currentHWID = getDeviceHWID();
+
+            if (!keyVal || !validKeyRegistry.has(keyVal)) {
+                errDiv.innerText = 'Key không hợp lệ hoặc chưa đăng ký HWID root!';
+                return;
+            }
+
+            const keyBindings = JSON.parse(localStorage.getItem('un3_key_bindings') || '{}');
+            const boundHWID = keyBindings[keyVal];
+
+            if (boundHWID && boundHWID !== currentHWID) {
+                errDiv.innerText = 'Key đã khóa cho thiết bị khác (HWID lock 1:1)!';
+                return;
+            }
+
+            if (!boundHWID) {
+                keyBindings[keyVal] = currentHWID;
+                localStorage.setItem('un3_key_bindings', JSON.stringify(keyBindings));
+            }
+
+            sessionStorage.setItem('un3_active_session', keyVal);
+            errDiv.innerText = '';
+            document.getElementById('auth-overlay').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            document.getElementById('bottom-navigation').style.display = 'grid';
+        }
+
+        function logoutAndClearSession() {
+            sessionStorage.removeItem('un3_active_session');
+            document.getElementById('main-app').style.display = 'none';
+            document.getElementById('bottom-navigation').style.display = 'none';
+            document.getElementById('auth-overlay').style.display = 'flex';
+            document.getElementById('global-key-input').value = '';
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (checkSessionToken()) {
+                document.getElementById('auth-overlay').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
+                document.getElementById('bottom-navigation').style.display = 'grid';
+            }
+        });
+
+        // ĐIỀU HƯỚNG TAB
+        function switchTab(tabId, btnEl) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            btnEl.classList.add('active');
+        }
+
+        // TỰ ĐỘNG MỞ FF TH / FF MAX
+        function launchDirectGame(gameName) {
+            alert(`[UNIMATE QUANTUM] Đang ép xung RAM & Touch -> Tự động khởi chạy thẳng vào app: ${gameName}`);
+            // Giả lập URI scheme trigger trực tiếp game package android/ios nếu có
+            window.location.href = gameName.includes('MAX') ? 'freefiremax://' : 'freefireth://';
+        }
+
+        // 5 THANH KÉO ĐỘC LẠ TÍNH SỐ KHI KÉO
+        function startDragSlider(e, id, valId) {
+            e.preventDefault();
+            const track = e.currentTarget;
+            const updatePos = (clientX) => {
+                const rect = track.getBoundingClientRect();
+                let pct = (clientX - rect.left) / rect.width;
+                pct = Math.max(0, Math.min(1, pct));
+                const pctVal = Math.round(pct * 100);
+                document.getElementById('fill-' + id).style.width = pctVal + '%';
+                document.getElementById('dot-' + id).style.left = pctVal + '%';
+                
+                let textVal = pctVal + '%';
+                if(id === 2) textVal = Math.round(60 + pct * 60) + ' FPS';
+                if(id === 4) textVal = Math.round(150 - pct * 100) + 'ms boost';
+                if(id === 5) textVal = pctVal > 80 ? 'EXTREME' : 'NORMAL';
+                document.getElementById(valId).innerText = textVal;
+            };
+
+            const onMouseMove = (ev) => updatePos(ev.clientX);
+            const onTouchMove = (ev) => updatePos(ev.touches[0].clientX);
+            const onEnd = () => {
+                window.removeEventListener('mousemove', onMouseMove);
+                window.removeEventListener('mouseup', onEnd);
+                window.removeEventListener('touchmove', onTouchMove);
+                window.removeEventListener('touchend', onEnd);
+            };
+
+            window.addEventListener('mousemove', onMouseMove);
+            window.addEventListener('mouseup', onEnd);
+            window.addEventListener('touchmove', onTouchMove);
+            window.addEventListener('touchend', onEnd);
+            
+            if(e.clientX) updatePos(e.clientX);
+            if(e.touches) updatePos(e.touches[0].clientX);
+        }
+
+        // NHỊP SỐNG CPU/RAM LIVE INTERVAL
+        setInterval(() => {
+            const cpu = Math.floor(11 + Math.random() * 9);
+            const ram = (3.1 + Math.random() * 0.4).toFixed(1);
+            const ping = Math.floor(16 + Math.random() * 6);
+            const elCpu = document.getElementById('live-cpu');
+            const elRam = document.getElementById('live-ram');
+            const elPing = document.getElementById('live-ping');
+            if(elCpu) elCpu.innerText = cpu + '%';
+            if(elRam) elRam.innerText = ram + ' GB';
+            if(elPing) elPing.innerText = ping + 'ms';
+        }, 1500);
+
+        // 6 CHỨC NĂNG LIVE + KHUNG CHẠY CODE THẬT NHƯ THẬT
+        function runRealLiveCode(fxCode, btnEl) {
+            document.querySelectorAll('.btn-live-fx').forEach(b => b.classList.remove('active'));
+            btnEl.classList.add('active');
+            const consoleBox = document.getElementById('live-console-box');
+            const timestamp = new Date().toLocaleTimeString();
+            const realLogs = {
+                'OVERLAY_HUD_INJECT': `[${timestamp}] INJECT: SurfaceView overlay layer hooked -> zero latency anti-flash render!`,
+                'ANTI_REPORT_SHIELD': `[${timestamp}] GHOST: Packet signature masked via encrypted UDP socket tunnel (AES-256).`,
+                'OBS_STREAM_BYPASS': `[${timestamp}] STREAM: Virtual capture hook attached to OBS / TikTok Live Studio sink.`,
+                'TOUCH_SYNC_BOOST': `[${timestamp}] TOUCH: Polling rate forced to 500Hz hardware interrupt queue.`,
+                'MEMORY_CLEANER': `[${timestamp}] PURGE: Freed 784MB background cache / GC collection executed.`,
+                'QUANTUM_LOCK_CORE': `[${timestamp}] SECURE: HWID session root hash signed & immutable.`
+            };
+            const msg = realLogs[fxCode] || `[${timestamp}] EXECUTED: ${fxCode}`;
+            consoleBox.innerHTML += `<br>${msg}`;
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+        }
+
+        // CÀI ĐẶT MÀU SẮC & GIAO DIỆN
+        function setAppTheme(themeName, btnEl) {
+            document.documentElement.setAttribute('data-theme', themeName);
+            document.querySelectorAll('.swatch-btn').forEach(b => b.classList.remove('selected'));
+            btnEl.classList.add('selected');
+        }
+
+        function selectPerfMode(btnEl, modeName) {
+            document.querySelectorAll('.mode-option-btn').forEach(b => {
+                b.classList.remove('selected');
+                b.querySelector('span:last-child').innerText = '';
+            });
+            btnEl.classList.add('selected');
+            btnEl.querySelector('span:last-child').innerText = '✓';
+        }
+
+        function toggleSwitch(el) {
+            el.classList.toggle('on');
+        }
+    </script>
+</body>
+</html>

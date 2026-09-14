@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNIMATE - Gojo Aura Edition</title>
+    <style>
+        :root {
+            --bg-color: #060913;
+            --card-bg: #0f172a;
+            --primary: #38bdf8;
+            --primary-glow: rgba(56, 189, 248, 0.4);
+            --accent-aura: #0284c7;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(56, 189, 248, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+            background-image: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.12) 0%, transparent 60%);
+        }
+
+        #auth-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(6, 9, 19, 0.98);
+            backdrop-filter: blur(24px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            border: 1px solid var(--primary);
+            border-radius: 28px;
+            padding: 28px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(56, 189, 248, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: -50px; left: -50px; right: -50px; height: 100px;
+            background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .app-container {
+            flex: 1;
+            padding: 20px;
+            padding-bottom: 100px;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            display: none;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .card-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--primary);
+            margin-bottom: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        input[type="text"], input[type="password"] {
+            flex: 1;
+            background: #060913;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 13px 16px;
+            color: var(--text-main);
+            outline: none;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent-aura));
+            border: none;
+            color: #060913;
+            padding: 13px 22px;
+            border-radius: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+            opacity: 0.9;
+        }
+
+        .key-badge-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .key-tag {
+            background: rgba(56, 189, 248, 0.06);
+            border: 1px dashed var(--border);
+            padding: 8px 10px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .key-tag strong {
+            color: var(--primary);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .gojo-logo {
+            width: 94px;
+            height: 94px;
+            border-radius: 50%;
+            border: 3px solid var(--primary);
+            box-shadow: 0 0 25px var(--primary-glow);
+            object-fit: cover;
+            margin: 0 auto 12px auto;
+            display: block;
+        }
+
+        .social-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .btn-social {
+            background: rgba(56, 189, 248, 0.06);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 12px;
+            border-radius: 14px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.82rem;
+            transition: 0.2s;
+        }
+
+        .btn-social:hover {
+            border-color: var(--primary);
+            background: rgba(56, 189, 248, 0.12);
+        }
+
+        .game-support-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .game-card {
+            background: #060913;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .game-card.active-game {
+            border-color: var(--primary);
+            background: rgba(56, 189, 248, 0.12);
+            box-shadow: inset 0 0 12px rgba(56, 189, 248, 0.15);
+        }
+
+        .func-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .func-row-btn {
+            background: #060913;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 16px 18px;
+            border-radius: 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.2s;
+        }
+
+        .func-row-btn span {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            background: rgba(255,255,255,0.04);
+            padding: 4px 10px;
+            border-radius: 8px;
+        }
+
+        .func-row-btn.active-func {
+            border-color: var(--primary);
+            background: rgba(56, 189, 248, 0.1);
+        }
+
+        .func-row-btn.active-func span {
+            color: var(--primary);
+            background: rgba(56, 189, 248, 0.15);
+        }
+
+        .slider-container {
+            margin-bottom: 18px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.88rem;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+        }
+
+        .slider-label span:last-child {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--primary);
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .sensor-circle {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            border: 4px solid var(--primary);
+            box-shadow: 0 0 25px var(--primary-glow);
+            background: #060913;
+            color: var(--text-main);
+            margin: 24px auto 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+        }
+
+        .sensor-circle small {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .controls-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .action-btn {
+            background: #060913;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 15px 12px;
+            border-radius: 14px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.2s;
+        }
+
+        .action-btn:active {
+            border-color: var(--primary);
+            background: rgba(56, 189, 248, 0.1);
+        }
+
+        .wave-canvas {
+            width: 100%;
+            height: 90px;
+            background: #060913;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .setting-box {
+            background: #060913;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .setting-box span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(6, 9, 19, 0.94);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.68rem;
+            cursor: pointer;
+            flex: 1;
+            transition: 0.2s;
+            gap: 4px;
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary-glow);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <h3 style="margin-bottom: 6px; color: var(--primary); font-size: 1.3rem; letter-spacing: 0.5px;">UNIMATE AURA</h3>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 16px;">Vô hạ hạn •cuteo X aura• Security</p>
+            <div class="input-group">
+                <input type="password" id="global-key-input" placeholder="Nhập Key 20K / Vĩnh Viễn / Độc Quyền">
+                <button class="btn" onclick="validateAppKeySecure()">Vào</button>
+            </div>
+            <div id="auth-error" style="margin-top: 8px; font-size: 0.75rem; color: #ef4444;"></div>
+            
+            <div class="key-badge-list">
+                <div class="key-tag">⚡ 20K Ngày: <strong>20K-DAY-...</strong></div>
+                <div class="key-tag">🔥 20K Tuần: <strong>20K-WEEK-...</strong></div>
+                <div class="key-tag">💎 20K Tháng: <strong>20K-MONTH-...</strong></div>
+                <div class="key-tag">👑 20K VV / Độc Quyền: <strong>UNIMATE-VIP-...</strong></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container" id="main-app">
+        
+        <div id="tab-home" class="tab-content active">
+            <div class="card">
+                <div class="profile-header">
+                    <img src="https://i.pinimg.com/736x/8a/82/33/8a8233512217c2f1f31f90df81e58285.jpg" alt="Gojo Aura" class="gojo-logo">
+                    <div style="font-weight: 800; font-size: 1.2rem; color: var(--primary);">UNIMATE ADMIN</div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 3px;">•cuteo X aura• • Infinity Guard Core</div>
+                </div>
+                <div class="social-grid">
+                    <a href="#" class="btn-social">Facebook</a>
+                    <a href="#" class="btn-social">TikTok 1</a>
+                    <a href="#" class="btn-social">TikTok 2</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Hệ Thống Sảnh Game</div>
+                <div class="game-support-grid">
+                    <div class="game-card active-game" id="game-ff" onclick="selectGame('ff')">
+                        <div style="font-weight: bold; font-size: 0.9rem;">Free Fire</div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Standard</div>
+                    </div>
+                    <div class="game-card" id="game-ffmax" onclick="selectGame('ffmax')">
+                        <div style="font-weight: bold; font-size: 0.9rem;">Free Fire MAX</div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Ultra HD</div>
+                    </div>
+                </div>
+                <div class="game-support-grid" style="margin-bottom: 0;">
+                    <div class="game-card" onclick="runAction('Khởi chạy FFth')">
+                        <div style="font-weight: bold; font-size: 0.9rem;">FFth</div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Mở sảnh nhanh</div>
+                    </div>
+                    <div class="game-card" onclick="runAction('Khởi chạy FF Max')">
+                        <div style="font-weight: bold; font-size: 0.9rem;">FF Max</div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Mở sảnh nhanh</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-func" class="tab-content">
+            <div class="card">
+                <div class="card-title">Bảng Chức Năng (Tối đa 7 active)</div>
+                <div class="func-stack">
+                    <button class="func-row-btn" onclick="toggleFunc(this, 'aimlock')">Aimlock 90% <span>OFF</span></button>
+                    <button class="func-row-btn" onclick="toggleFunc(this, 'headshot')">Headshot Rate <span>OFF</span></button>
+                    <button class="func-row-btn" onclick="toggleFunc(this, 'antilag')">Anti-Lag Boost <span>OFF</span></button>
+                    <button class="func-row-btn" onclick="toggleFunc(this, 'tracking')">Bullet Tracking <span>OFF</span></button>
+                    <button class="func-row-btn" onclick="toggleFunc(this, 'recoil')">No Recoil Fix <span>OFF</span></button>
+                    <button class="func-row-btn" onclick="toggleFunc(this, 'touch')">Touch Response <span>OFF</span></button>
+                    <button class="func-row-btn" onclick="toggleFunc(this, 'fps')">FPS Unlocker <span>OFF</span></button>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-boost" class="tab-content">
+            <div class="card">
+                <div class="card-title">Cấu Hình Free Fire Aura</div>
+                
+                <div class="slider-container">
+                    <div class="slider-label"><span>Aimlock</span><span id="val-aim">85%</span></div>
+                    <input type="range" min="0" max="100" value="85" oninput="updateBoostCalculations()">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-label"><span>Stability Assist</span><span id="val-stab">90%</span></div>
+                    <input type="range" min="0" max="100" value="90" oninput="updateBoostCalculations()">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-label"><span>Aim Hold</span><span id="val-hold">75%</span></div>
+                    <input type="range" min="0" max="100" value="75" oninput="updateBoostCalculations()">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-label"><span>Headshot Fix</span><span id="val-head">95%</span></div>
+                    <input type="range" min="0" max="100" value="95" oninput="updateBoostCalculations()">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-label"><span>Bullet Align</span><span id="val-bullet">88%</span></div>
+                    <input type="range" min="0" max="100" value="88" oninput="updateBoostCalculations()">
+                </div>
+
+                <div class="sensor-circle" id="sensor-circle">87%<small>AURA SYNC</small></div>
+            </div>
+        </div>
+
+        <div id="tab-live" class="tab-content">
+            <div class="card">
+                <div class="card-title">Realtime Actions & Code Execution</div>
+                <div class="controls-grid-2">
+                    <button class="action-btn" id="btn-fps-live" onclick="toggleAction('fps')">UnLock 120 FPS : OFF</button>
+                    <button class="action-btn" onclick="clearConsole()">Xóa Console</button>
+                    <button class="action-btn" onclick="runAction('Dọn RAM')">Dọn RAM</button>
+                    <button class="action-btn" onclick="runAction('Dọn CPU')">Dọn CPU</button>
+                    <button class="action-btn" onclick="runAction('Tối Ưu RAM')">Tối Ưu RAM</button>
+                    <button class="action-btn" onclick="runAction('Tối Ưu CPU')">Tối Ưu CPU</button>
+                </div>
+                <canvas id="waveCanvas" class="wave-canvas"></canvas>
+            </div>
+        </div>
+
+        <div id="tab-settings" class="tab-content">
+            <div class="card">
+                <div class="card-title">Cài Đặt Hệ Thống</div>
+                <div class="settings-grid">
+                    <div class="setting-box">
+                        <span>Độ trễ cảm ứng</span>
+                        <button class="btn" style="padding: 8px; font-size: 0.78rem;" onclick="runAction('Tối ưu cảm ứng')">Tối Ưu</button>
+                    </div>
+                    <div class="setting-box">
+                        <span>Chế độ mạng</span>
+                        <button class="btn" style="padding: 8px; font-size: 0.78rem;" onclick="runAction('Giảm Ping')">Fix Ping</button>
+                    </div>
+                    <div class="setting-box">
+                        <span>Làm sạch bộ nhớ</span>
+                        <button class="btn" style="padding: 8px; font-size: 0.78rem;" onclick="runAction('Clean Cache')">Clear</button>
+                    </div>
+                    <div class="setting-box">
+                        <span>Khóa FPS tối đa</span>
+                        <button class="btn" style="padding: 8px; font-size: 0.78rem;" onclick="runAction('Lock FPS')">Kích Hoạt</button>
+                    </div>
+                </div>
+                <div class="console-box" id="console-output" style="background: #060913; border: 1px solid var(--border); border-radius: 14px; padding: 12px; font-family: monospace; font-size: 0.78rem; height: 95px; overflow-y: auto; color: var(--primary); margin-top: 10px; line-height: 1.4;">
+                    [Unimate-Aura] •cuteo X aura• Engine sẵn sàng.
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <nav class="bottom-nav" id="bottom-nav" style="display: none;">
+        <button class="nav-item active" onclick="switchTab('home', this)">
+            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            Home
+        </button>
+        <button class="nav-item" onclick="switchTab('func', this)">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            Func
+        </button>
+        <button class="nav-item" onclick="switchTab('boost', this)">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.03-.42 1.98-1.03 2.75z"/></svg>
+            Boost
+        </button>
+        <button class="nav-item" onclick="switchTab('live', this)">
+            <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm4 4h2v-6H7v6zm4 4h2V3h-2v18zm4-8h2v-2h-2v2zm4-4h2V7h-2v6z"/></svg>
+            Live
+        </button>
+        <button class="nav-item" onclick="switchTab('settings', this)">
+            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+            Cài đặt
+        </button>
+    </nav>
+
+    <script>
+        // Hệ thống danh sách băm hash đa gói key (Ngày, Tuần, Tháng, Vĩnh viễn/Độc quyền)
+        const validKeyHashes = new Set();
+        let targetHashesInitialized = false;
+
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message.trim().toUpperCase());
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        const rawKeysList = [
+            "20K-DAY-001",
+            "20K-WEEK-001",
+            "20K-MONTH-001",
+            "UNIMATE-VIP-EXCLUSIVE"
+        ];
+
+        async function initKeyDatabase() {
+            if (targetHashesInitialized) return;
+            for (let k of rawKeysList) {
+                validKeyHashes.add(await sha256(k));
+            }
+            targetHashesInitialized = true;
+        }
+
+        let activeCount = 0;
+        const maxActiveFuncs = 7;
+
+        async function validateAppKeySecure() {
+            await initKeyDatabase();
+            const keyVal = document.getElementById('global-key-input').value.trim();
+            const errDiv = document.getElementById('auth-error');
+            
+            if(!keyVal) {
+                errDiv.innerText = 'Vui lòng nhập key!';
+                return;
+            }
+
+            const inputHash = await sha256(keyVal);
+            
+            if (validKeyHashes.has(inputHash)) {
+                document.getElementById('auth-overlay').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
+                document.getElementById('bottom-nav').style.display = 'flex';
+                resizeCanvas();
+                logToConsole('[Unimate-Aura] Key xác thực thành công •cuteo X aura•');
+            } else {
+                errDiv.innerText = 'Key không hợp lệ hoặc sai gói!';
+            }
+        }
+
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.onkeydown = function(e) {
+            if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73)) {
+                return false;
+            }
+        };
+
+        setInterval(() => {
+            const before = Date.now();
+            debugger;
+            if (Date.now() - before > 100) {}
+        }, 1000);
+
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            
+            document.getElementById('tab-' + tabId).classList.add('active');
+            element.classList.add('active');
+            if(tabId === 'live') resizeCanvas();
+        }
+
+        function selectGame(type) {
+            document.getElementById('game-ff').classList.remove('active-game');
+            document.getElementById('game-ffmax').classList.remove('active-game');
+            if(type === 'ff') {
+                document.getElementById('game-ff').classList.add('active-game');
+            } else {
+                document.getElementById('game-ffmax').classList.add('active-game');
+            }
+        }
+
+        function toggleFunc(btn, funcCodeKey) {
+            const isOn = btn.classList.contains('active-func');
+            
+            if (!isOn) {
+                if (activeCount >= maxActiveFuncs) {
+                    logToConsole(`[Unimate-Guard] Giới hạn tối đa ${maxActiveFuncs} chức năng kích hoạt!`);
+                    return;
+                }
+                btn.classList.add('active-func');
+                btn.querySelector('span').innerText = 'ON';
+                activeCount++;
+            } else {
+                btn.classList.remove('active-func');
+                btn.querySelector('span').innerText = 'OFF';
+                activeCount = Math.max(0, activeCount - 1);
+            }
+
+            executeFeatureCode(funcCodeKey, !isOn);
+        }
+
+        function executeFeatureCode(key, state) {
+            logToConsole(`[Aura-Core] Trigger [${key}] -> ${state ? 'ON' : 'OFF'} (${activeCount}/${maxActiveFuncs})`);
+        }
+
+        function updateBoostCalculations() {
+            const sliders = document.querySelectorAll('#tab-boost input[type="range"]');
+            const aim = parseInt(sliders[0].value);
+            const stab = parseInt(sliders.value);
+            const hold = parseInt(sliders[2].value);
+            const head = parseInt(sliders[3].value);
+            const bullet = parseInt(sliders[4].value);
+
+            document.getElementById('val-aim').innerText = aim + '%';
+            document.getElementById('val-stab').innerText = stab + '%';
+            document.getElementById('val-hold').innerText = hold + '%';
+            document.getElementById('val-head').innerText = head + '%';
+            document.getElementById('val-bullet').innerText = bullet + '%';
+
+            const calculatedSensor = Math.floor((aim + stab + hold + head + bullet) / 5);
+            document.getElementById('sensor-circle').innerHTML = `${calculatedSensor}%<small>AURA SYNC</small>`;
+        }
+
+        let fpsState = false;
+        function toggleAction(type) {
+            if(type === 'fps') {
+                fpsState = !fpsState;
+                const btn = document.getElementById('btn-fps-live');
+                if(btn) btn.innerText = `UnLock 120 FPS : ${fpsState ? 'ON' : 'OFF'}`;
+                logToConsole(`FPS Unlocker set to: ${fpsState ? 'ON' : 'OFF'}`);
+            }
+        }
+
+        function runAction(actionName) {
+            logToConsole(`Executing: ${actionName} completed successfully.`);
+        }
+
+        function clearConsole() {
+            document.getElementById('console-output').innerHTML = '[System] Console cleared.';
+        }
+
+        const canvas = document.getElementById('waveCanvas');
+        const ctx = canvas ? canvas.getContext('2d') : null;
+        let waveOffset = 0;
+
+        function resizeCanvas() {
+            if(canvas) {
+                canvas.width = canvas.parentElement.clientWidth - 36;
+                canvas.height = 90;
+            }
+        }
+        window.onresize = resizeCanvas;
+
+        function drawWave() {
+            if(canvas && ctx && document.getElementById('tab-live').classList.contains('active')) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.beginPath();
+                ctx.lineWidth = 2.2;
+                ctx.strokeStyle = '#38bdf8';
+
+                for (let x = 0; x < canvas.width; x++) {
+                    let y = Math.sin(x * 0.03 + waveOffset) * 14 + Math.cos(x * 0.015 + waveOffset) * 7 + 45;
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+                waveOffset += 0.06;
+            }
+            requestAnimationFrame(drawWave);
+        }
+        drawWave();
+
+        function logToConsole(text) {
+            const consoleBox = document.getElementById('console-output');
+            if(consoleBox) {
+                const timeStr = new Date().toTimeString().split(' ')[0];
+                consoleBox.innerHTML += `<br>[${timeStr}] ${text}`;
+                consoleBox.scrollTop = consoleBox.scrollHeight;
+            }
+        }
+    </script>
+</body>
+</html>

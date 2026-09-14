@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNIMATE V3 - Standalone PWA Launcher</title>
+    <style>
+        :root {
+            --bg-color: #030712;
+            --card-bg: #0b1329;
+            --primary: #c084fc;
+            --primary-glow: rgba(192, 132, 252, 0.45);
+            --accent-aura: #f472b6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(192, 132, 252, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+            background-image: radial-gradient(circle at 50% 0%, var(--primary-glow) 0%, transparent 65%);
+        }
+
+        #auth-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(3, 7, 18, 0.98);
+            backdrop-filter: blur(24px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            border: 1.5px solid var(--primary);
+            border-radius: 28px;
+            padding: 28px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 0 50px var(--primary-glow);
+        }
+
+        .divine-logo-container {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 2.5px solid var(--primary);
+            box-shadow: 0 0 30px var(--primary-glow);
+            margin: 0 auto 12px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: divinePulse 3s infinite alternate;
+            background: #030712;
+            font-weight: 900;
+            font-size: 1.1rem;
+            color: var(--primary);
+            letter-spacing: 1px;
+        }
+
+        @keyframes divinePulse {
+            0% { box-shadow: 0 0 20px var(--primary-glow); transform: scale(1); }
+            100% { box-shadow: 0 0 40px var(--accent-aura); transform: scale(1.03); }
+        }
+
+        .app-container {
+            flex: 1;
+            padding: 20px;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            display: none;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            backdrop-filter: blur(12px);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .social-grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .btn-social {
+            background: rgba(192, 132, 252, 0.08);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 10px 6px;
+            border-radius: 12px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.75rem;
+            transition: 0.2s;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        input[type="text"], input[type="password"] {
+            flex: 1;
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 13px 16px;
+            color: var(--text-main);
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent-aura));
+            border: none;
+            color: #030712;
+            padding: 13px 22px;
+            border-radius: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-danger-outline {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 14px;
+            width: 100%;
+        }
+
+        .app-features-list {
+            margin-top: 14px;
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .app-features-list strong {
+            color: var(--primary);
+        }
+
+        .pwa-add-section {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            margin-top: 12px;
+        }
+
+        .pwa-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .pwa-item {
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.88rem;
+        }
+
+        .pwa-item-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .pwa-item-actions button.launch-standalone {
+            background: var(--primary-glow);
+            border: 1px solid var(--primary);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .pwa-item-actions button.remove-pwa {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        #pwa-sandbox-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #030712;
+            z-index: 99999;
+            display: none;
+            flex-direction: column;
+        }
+
+        .pwa-sandbox-header {
+            background: #0b1329;
+            border-bottom: 1px solid var(--border);
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .pwa-sandbox-header button {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 6px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .pwa-sandbox-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body data-theme="divine">
+
+    <!-- OVERLAY ĐĂNG NHẬP / NHẬP KEY MỚI -->
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <div class="divine-logo-container">UNIMATE</div>
+            <h3 style="margin-bottom: 4px; color: var(--primary); font-size: 1.3rem;">UNIMATE V3</h3>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 18px;">•cuteo X aura• Standalone Core</p>
+            <div class="input-group">
+                <input type="password" id="global-key-input" placeholder="Nhập key hoàn toàn mới">
+                <button class="btn" onclick="validateAppKeySecure()">Vào</button>
+            </div>
+            <div id="auth-error" style="margin-top: 8px; font-size: 0.75rem; color: #ef4444;"></div>
+        </div>
+    </div>
+
+    <!-- SANDBOX FULLSCREEN STANDALONE (KHÔNG SAFARI UI) -->
+    <div id="pwa-sandbox-overlay">
+        <div class="pwa-sandbox-header">
+            <span id="pwa-sandbox-title">Standalone App</span>
+            <button onclick="closePWASandbox()">Thoát App</button>
+        </div>
+        <div class="pwa-sandbox-body">
+            <div style="font-size: 1.4rem; font-weight: 800; color: var(--primary); margin-bottom: 12px;" id="pwa-running-name">App Name</div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 320px; line-height: 1.6;">Đang chạy chế độ Web App độc lập nguyên bản (Không hiện thanh Safari/Trình duyệt).</p>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="app-container" id="main-app">
+        <div class="card">
+            <div class="profile-header">
+                <div class="divine-logo-container" style="width:78px;height:78px;font-size:0.95rem;">UNIMATE</div>
+                <div style="font-weight: 800; font-size: 1.2rem; color: var(--primary);">UNIMATE V3 • LAUNCHER</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 3px;">•cuteo X aura• PWA Mode</div>
+            </div>
+            <div class="social-grid-4">
+                <a href="https://zalo.me/84583516778" target="_blank" class="btn-social">Zalo</a>
+                <a href="#" class="btn-social">FB</a>
+                <a href="#" class="btn-social">TikTok 1</a>
+                <a href="#" class="btn-social">TikTok 2</a>
+            </div>
+            <div class="app-features-list">
+                <strong>Kho App Màn Hình Chính:</strong><br>
+                Thêm app tuỳ chỉnh và bấm mở để chạy chế độ standalone không viền Safari.
+            </div>
+            <div class="pwa-add-section">
+                <input type="text" id="pwa-app-name-input" placeholder="Tên App (VD: Free Fire / ZingMP3)">
+                <button class="btn" onclick="addAppToPWAHomeScreen()">Thêm MHC</button>
+            </div>
+            <div class="pwa-list" id="pwa-installed-list"></div>
+
+            <button class="btn-danger-outline" onclick="forceLogoutAndResetSession()">🚪 Đăng Xuất / Đổi Key Mới</button>
+        </div>
+    </div>
+
+    <script>
+        function getDeviceHWID() {
+            let hwid = localStorage.getItem('un3_hwid');
+            if (!hwid) {
+                hwid = 'HWID-' + Math.random().toString(36).substring(2, 10).toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
+                localStorage.setItem('un3_hwid', hwid);
+            }
+            return hwid;
+        }
+
+        const validKeyRegistry = new Set([
+            "UN3-VIP-EXCLUSIVE-DIVINE-ROOT-000",
+            "UN3-DAY-73-AURA", "UN3-DAY-146-AURA", "UN3-DAY-219-AURA", "UN3-DAY-292-AURA", "UN3-DAY-365-AURA",
+            "UN3-WEEK-91-AURA", "UN3-WEEK-182-AURA", "UN3-WEEK-273-AURA", "UN3-WEEK-364-AURA",
+            "UN3-MONTH-127-AURA", "UN3-MONTH-254-AURA", "UN3-MONTH-381-AURA",
+            "NEW-KEY-001", "NEW-KEY-002", "NEW-KEY-AURA-999"
+        ]);
+
+        function checkSessionToken() {
+            return sessionStorage.getItem('un3_active_session');
+        }
+
+        function validateAppKeySecure() {
+            const keyVal = document.getElementById('global-key-input').value.trim().toUpperCase();
+            const errDiv = document.getElementById('auth-error');
+            const currentHWID = getDeviceHWID();
+
+            if (!keyVal || !validKeyRegistry.has(keyVal)) {
+                errDiv.innerText = 'Key hoàn toàn mới không hợp lệ hoặc sai định dạng!';
+                return;
+            }
+
+            const keyBindings = JSON.parse(localStorage.getItem('un3_key_bindings') || '{}');
+            const boundHWID = keyBindings[keyVal];
+
+            if (boundHWID && boundHWID !== currentHWID) {
+                errDiv.innerText = 'Key đã khóa cho thiết bị khác (HWID lock 1:1)!';
+                return;
+            }
+
+            if (!boundHWID) {
+                keyBindings[keyVal] = currentHWID;
+                localStorage.setItem('un3_key_bindings', JSON.stringify(keyBindings));
+            }
+
+            sessionStorage.setItem('un3_active_session', keyVal);
+
+            errDiv.innerText = '';
+            document.getElementById('auth-overlay').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            renderPWAList();
+        }
+
+        function forceLogoutAndResetSession() {
+            sessionStorage.removeItem('un3_active_session');
+            document.getElementById('global-key-input').value = '';
+            document.getElementById('auth-error').innerText = '';
+            document.getElementById('main-app').style.display = 'none';
+            document.getElementById('auth-overlay').style.display = 'flex';
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const activeSession = checkSessionToken();
+            if(activeSession) {
+                document.getElementById('auth-overlay').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
+                renderPWAList();
+            } else {
+                document.getElementById('auth-overlay').style.display = 'flex';
+                document.getElementById('main-app').style.display = 'none';
+            }
+        });
+
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        function getPWAList() {
+            return JSON.parse(localStorage.getItem('un3_pwa_apps') || '["Free Fire TH", "Free Fire MAX", "Zing MP3"]');
+        }
+
+        function savePWAList(list) {
+            localStorage.setItem('un3_pwa_apps', JSON.stringify(list));
+        }
+
+        function renderPWAList() {
+            const list = getPWAList();
+            const container = document.getElementById('pwa-installed-list');
+            if(!container) return;
+            container.innerHTML = list.map((name, index) => `
+                <div class="pwa-item">
+                    <span style="font-weight:600; color:var(--text-main);">📱 ${name}</span>
+                    <div class="pwa-item-actions">
+                        <button class="launch-standalone" onclick="launchPWASandbox('${name}')">Mở App</button>
+                        <button class="remove-pwa" onclick="removePWAApp(${index})">Xóa</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addAppToPWAHomeScreen() {
+            const input = document.getElementById('pwa-app-name-input');
+            const name = input.value.trim();
+            if(!name) return;
+            const list = getPWAList();
+            list.push(name);
+            savePWAList(list);
+            input.value = '';
+            renderPWAList();
+        }
+
+        function removePWAApp(idx) {
+            const list = getPWAList();
+            list.splice(idx, 1);
+            savePWAList(list);
+            renderPWAList();
+        }
+
+        function launchPWASandbox(appName) {
+            document.getElementById('pwa-sandbox-title').innerText = 'Standalone • ' + appName;
+            document.getElementById('pwa-running-name').innerText = appName;
+            document.getElementById('pwa-sandbox-overlay').style.display = 'flex';
+        }
+
+        function closePWASandbox() {
+            document.getElementById('pwa-sandbox-overlay').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
